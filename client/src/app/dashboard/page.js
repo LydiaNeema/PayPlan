@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useAuth } from "../../context/AuthContext";
-import { DollarSign, Calendar, AlertTriangle, TrendingUp } from "lucide-react";
+import { Wallet, Calendar, AlertTriangle, TrendingUp } from "lucide-react";
 import Navbar from "../../components/Navbar";
 import ServiceCard from "../../components/ServiceCard";
 import PaymentItem from "../../components/PaymentItem";
@@ -14,6 +14,7 @@ import {
   getOverduePayments,
   markPaymentAsPaid,
   getServices,
+  getHousehold,
 } from "../../utils/api";
 
 export default function DashboardPage() {
@@ -22,6 +23,7 @@ export default function DashboardPage() {
   const [services, setServices] = useState([]);
   const [upcomingPayments, setUpcomingPayments] = useState([]);
   const [overduePayments, setOverduePayments] = useState([]);
+  const [household, setHousehold] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const formatCurrency = (amount) =>
@@ -31,25 +33,27 @@ export default function DashboardPage() {
       minimumFractionDigits: 0,
     }).format(amount);
 
-    // Derive display name
+  // Derive display name
   const displayName =
     user?.username ||
     user?.name ||
     (user?.email ? user.email.split("@")[0] : "there");
 
-
   // Fetch data
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [servicesData, upcomingData, overdueData] = await Promise.all([
+        const [servicesData, upcomingData, overdueData, householdData] = await Promise.all([
           getServices(token),
           getUpcomingPayments(token),
           getOverduePayments(token),
+          getHousehold(token),
         ]);
+
         setServices(servicesData || []);
         setUpcomingPayments(upcomingData || []);
         setOverduePayments(overdueData || []);
+        setHousehold(householdData || null);
       } catch (error) {
         console.error("Error loading dashboard data:", error);
       } finally {
@@ -102,37 +106,42 @@ export default function DashboardPage() {
           Hello, {displayName}! 👋
         </h1>
         <p className="text-white/70">Manage your recurring payments</p>
+        {household && (
+          <p className="text-white/70 mt-1">
+            Household: {household.name}
+          </p>
+        )}
       </div>
 
-      {/* Stats Section with gradients */}
+      {/* Stats Section with colored border and icons */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
         <StatsCard
           title="Monthly Total"
           value={formatCurrency(totalMonthlyAmount)}
           subtitle="Estimated monthly spending"
-          icon={<DollarSign className="w-5 h-5 text-white" />}
-          colors={["#4ade80", "#16a34a"]} // green gradient
+          icon={<Wallet className="w-5 h-5 text-blue-400" />}
+          cardClass="backdrop-blur-xl bg-white/5 border-l-2 border-blue-400"
         />
         <StatsCard
           title="Active Services"
           value={services.length.toString()}
           subtitle="Subscriptions & services"
-          icon={<TrendingUp className="w-5 h-5 text-white" />}
-          colors={["#38bdf8", "#0ea5e9"]} // blue gradient
+          icon={<TrendingUp className="w-5 h-5 text-green-400" />}
+          cardClass="backdrop-blur-xl bg-white/5 border-l-2 border-green-400"
         />
         <StatsCard
           title="Due Soon"
           value={upcomingPayments.length.toString()}
           subtitle="Next 30 days"
-          icon={<Calendar className="w-5 h-5 text-white" />}
-          colors={["#facc15", "#eab308"]} // yellow gradient
+          icon={<Calendar className="w-5 h-5 text-yellow-400" />}
+          cardClass="backdrop-blur-xl bg-white/5 border-l-2 border-yellow-400"
         />
         <StatsCard
           title="Overdue"
           value={overduePayments.length.toString()}
           subtitle="Needs attention"
-          icon={<AlertTriangle className="w-5 h-5 text-white" />}
-          colors={["#f87171", "#dc2626"]} // red gradient
+          icon={<AlertTriangle className="w-5 h-5 text-red-400" />}
+          cardClass="backdrop-blur-xl bg-white/5 border-l-2 border-red-400"
         />
       </div>
 
@@ -225,7 +234,7 @@ export default function DashboardPage() {
             Start by adding your first subscription or recurring service.
           </p>
           <Link
-            href="/services"
+            href="/service"
             className="mt-4 inline-block text-red-400 font-semibold hover:text-red-500"
           >
             Add Your First Service →
