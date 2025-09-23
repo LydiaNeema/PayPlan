@@ -1,4 +1,4 @@
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:5555";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:5000";
 
 // Generic request helper
 export async function request(path, { method = "GET", body, token, isForm = false } = {}) {
@@ -35,15 +35,15 @@ export async function request(path, { method = "GET", body, token, isForm = fals
 // Auth requests
 export async function signupRequest(payload) {
   // payload = { username, email, password, household_id? }
-  return request("/signup", { method: "POST", body: payload });
+  return request("/auth/signup", { method: "POST", body: payload });
 }
 
 export async function loginRequest(email, password) {
-  return request("/login", { method: "POST", body: { email, password } });
+  return request("/auth/signin", { method: "POST", body: { email, password } });
 }
 
 export async function fetchCurrentUser(token) {
-  return request("/me", { method: "GET", token });
+  return request("/auth/profile", { method: "GET", token });
 }
 
 // Dashboard / expenses requests
@@ -76,7 +76,24 @@ export async function markPaymentAsPaid(paymentId, token) {
   return request(`/payments/${paymentId}/pay`, { method: "POST", token });
 }
 
-// ✅ Added to support DashboardPage
+//  Services CRUD
 export async function getServices(token) {
   return request("/services", { method: "GET", token });
+}
+
+export async function createService(payload, token) {
+  return request("/services", { method: "POST", body: payload, token });
+}
+
+export async function updateService(id, payload, token) {
+  return request(`/services/${id}`, { method: "PATCH", body: payload, token });
+}
+
+export async function deleteService(id, token) {
+  return request(`/services/${id}`, { method: "DELETE", token });
+}
+
+//  Household support for DashboardPage
+export async function getHousehold(token) {
+  return request("/household", { method: "GET", token });
 }
