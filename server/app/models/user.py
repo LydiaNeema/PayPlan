@@ -1,5 +1,5 @@
 from werkzeug.security import generate_password_hash, check_password_hash
-from app.extensions import db
+from app import db
 
 class User(db.Model):
     __tablename__ = "users"
@@ -9,12 +9,7 @@ class User(db.Model):
     email = db.Column(db.String(120), nullable=False, unique=True)
     password_hash = db.Column(db.String(200), nullable=False)
 
-    household_id = db.Column(db.Integer, db.ForeignKey("households.id"), nullable=True)
-
-    # Relationships
-    household = db.relationship("Household", back_populates="users")
-    expenses = db.relationship("Expense", back_populates="user", cascade="all, delete-orphan")
-
+    # Password handling
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 
