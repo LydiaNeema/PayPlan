@@ -1,12 +1,11 @@
 from flask import Blueprint, request, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from app.models.user import User
+from app import db
 
-from config import db
-from models.user import User
-
-# Create the blueprint for auth
-auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
+# Blueprint for auth
+auth_bp = Blueprint("auth", __name__)
 
 # ---------------- SIGNUP ----------------
 @auth_bp.route("/signup", methods=["POST"])
@@ -34,21 +33,17 @@ def signup():
 
     return jsonify({"message": "User created successfully"}), 201
 
-
 # ---------------- SIGNIN ----------------
 @auth_bp.route("/signin", methods=["POST"])
 def signin():
     data = request.get_json()
-
     email = data.get("email")
     password = data.get("password")
 
     user = User.query.filter_by(email=email).first()
-
     if not user or not check_password_hash(user.password_hash, password):
         return jsonify({"error": "Invalid email or password"}), 401
 
-    # Generate JWT
     access_token = create_access_token(identity=user.id)
 
     return jsonify({
@@ -61,8 +56,7 @@ def signin():
         }
     }), 200
 
-
-# ---------------- OPTIONAL: TEST TOKEN ----------------
+# ---------------- PROFILE ----------------
 @auth_bp.route("/profile", methods=["GET"])
 @jwt_required()
 def profile():
@@ -74,3 +68,4 @@ def profile():
         "username": user.username,
         "email": user.email
     }), 200
+
