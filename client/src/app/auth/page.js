@@ -28,13 +28,12 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      // Flask returns { access_token }
       const { access_token } = await loginRequest(email, password);
-      const user = await fetchCurrentUser(access_token); // fetch /me
+      const user = await fetchCurrentUser(access_token);
       login(access_token, user);
       router.push("/dashboard");
     } catch (err) {
-      setError(err.message || "Login failed");
+      setError(err.message || err.data?.error || "Login failed");
     } finally {
       setLoading(false);
     }
@@ -47,7 +46,6 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      // Build payload to match Flask /register
       const payload = {
         username: fullName,
         email,
@@ -56,13 +54,13 @@ export default function LoginPage() {
       };
 
       await signupRequest(payload); // create user
-      // Log in after successful signup
+      // Auto login after signup
       const { access_token } = await loginRequest(email, password);
       const user = await fetchCurrentUser(access_token);
       login(access_token, user);
       router.push("/dashboard");
     } catch (err) {
-      setError(err.message || "Signup failed");
+      setError(err.message || err.data?.error || "Signup failed");
     } finally {
       setLoading(false);
     }
@@ -121,7 +119,6 @@ export default function LoginPage() {
                   </span>
                 </div>
 
-                {/* ✅ Remember Me Checkbox */}
                 <div className="mb-4 flex items-center">
                   <input type="checkbox" id="remember" className="mr-2" />
                   <label htmlFor="remember" className="text-white/70 text-sm">
