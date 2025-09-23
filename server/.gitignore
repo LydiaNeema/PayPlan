@@ -16,5 +16,7 @@ env/
 *.swp
 *.swo
 
+
 # SQLite database
 instance/app.db
+
