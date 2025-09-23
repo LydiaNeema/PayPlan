@@ -1,0 +1,34 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+.env/
+*.env
+
+# Requirements (ignore local requirements file)
+requirements.txt
+
+# IDE / editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Database (if you’re using SQLite)
+*.sqlite3
+*.db
+
+# Pytest / coverage
+.coverage
+.pytest_cache/
+htmlcov/
