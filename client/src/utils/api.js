@@ -1,7 +1,6 @@
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:5555";
 
 // Generic request helper
-
 export async function request(path, { method = "GET", body, token, isForm = false } = {}) {
   const headers = {};
 
@@ -33,9 +32,7 @@ export async function request(path, { method = "GET", body, token, isForm = fals
   return data;
 }
 
-
 // Auth requests
-
 export async function signupRequest(payload) {
   // payload = { username, email, password, household_id? }
   return request("/signup", { method: "POST", body: payload });
@@ -49,9 +46,7 @@ export async function fetchCurrentUser(token) {
   return request("/me", { method: "GET", token });
 }
 
-
 // Dashboard / expenses requests
-
 export async function getExpenses(token) {
   return request("/expenses", { method: "GET", token });
 }
@@ -68,9 +63,7 @@ export async function deleteExpense(id, token) {
   return request(`/expenses/${id}`, { method: "DELETE", token });
 }
 
-
 // Payments (optional for recurring services)
-
 export async function getUpcomingPayments(token) {
   return request("/payments/upcoming", { method: "GET", token });
 }
@@ -81,4 +74,9 @@ export async function getOverduePayments(token) {
 
 export async function markPaymentAsPaid(paymentId, token) {
   return request(`/payments/${paymentId}/pay`, { method: "POST", token });
+}
+
+// ✅ Added to support DashboardPage
+export async function getServices(token) {
+  return request("/services", { method: "GET", token });
 }
