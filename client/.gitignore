@@ -1,8 +1,41 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# Python virtual environment
+venv/
+ENV/
+env/
 
-# dependencies
-/node_modules
-/.pnp
+# Python cache files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Migrations (optional: include if you want to track migrations)
+/instance/*.db
+
+# SQLite database files
+*.sqlite3
+*.db
+
+# Flask instance folder
+instance/
+
+# VS Code settings
+.vscode/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+
+# Env files (do not commit secrets)
+.env
+.env.*
+
+# Node/JS dependencies (if any)
+node_modules/
+.pnp/
 .pnp.*
 .yarn/*
 !.yarn/patches
@@ -10,32 +43,23 @@
 !.yarn/releases
 !.yarn/versions
 
-# testing
-/coverage
+# Testing
+coverage/
 
-# next.js
-/.next/
-/out/
+# Next.js / build outputs (if used)
+.next/
+out/
+build/
 
-# production
-/build
-
-# misc
-.DS_Store
+# Certificates and keys
 *.pem
 
-# debug
+# Debug logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
-
-# vercel
-.vercel
-
-# typescript
+# TypeScript build info
 *.tsbuildinfo
 next-env.d.ts
