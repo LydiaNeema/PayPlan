@@ -16,12 +16,10 @@ export function AuthProvider({ children }) {
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Load auth state from storage on mount
+  // Load auth state from localStorage on mount
   useEffect(() => {
-    const storedUser =
-      localStorage.getItem("user") || sessionStorage.getItem("user");
-    const storedToken =
-      localStorage.getItem("token") || sessionStorage.getItem("token");
+    const storedUser = localStorage.getItem("user");
+    const storedToken = localStorage.getItem("token");
 
     if (storedUser && storedToken) {
       setUser(JSON.parse(storedUser));
@@ -31,14 +29,12 @@ export function AuthProvider({ children }) {
     setLoading(false);
   }, []);
 
-  // Login function (now accepts rememberMe)
-  const login = (token, user, rememberMe = true) => {
+  // Login function
+  const login = (token, user) => {
     setToken(token);
     setUser(user);
-
-    const storage = rememberMe ? localStorage : sessionStorage;
-    storage.setItem("token", token);
-    storage.setItem("user", JSON.stringify(user));
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(user));
   };
 
   // Logout function
@@ -47,8 +43,6 @@ export function AuthProvider({ children }) {
     setUser(null);
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    sessionStorage.removeItem("token");
-    sessionStorage.removeItem("user");
   };
 
   const value = {
