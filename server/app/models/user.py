@@ -9,7 +9,7 @@ class User(db.Model):
     email = db.Column(db.String(120), nullable=False, unique=True)
     password_hash = db.Column(db.String(200), nullable=False)
 
-    household_id = db.Column(db.Integer, db.ForeignKey("households.id"), nullable=True)
+    #household_id = db.Column(db.Integer, db.ForeignKey("households.id"), nullable=True)
 
     # Password handling
     def set_password(self, password):
