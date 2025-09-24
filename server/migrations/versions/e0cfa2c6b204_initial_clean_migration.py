@@ -1,8 +1,8 @@
-"""Create users table without household
+"""initial clean migration
 
-Revision ID: ecd989f8ff32
+Revision ID: e0cfa2c6b204
 Revises: 
-Create Date: 2025-09-23 14:50:59.816567
+Create Date: 2025-09-24 01:58:29.927221
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'ecd989f8ff32'
+revision = 'e0cfa2c6b204'
 down_revision = None
 branch_labels = None
 depends_on = None

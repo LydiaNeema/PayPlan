@@ -1,15 +1,50 @@
-from .auth import auth_bp
-# from .categories import categories_bp
-# from .expenses import expenses_bp
-# from .household import household_bp
-# from .services import services_bp
-# from .payments import payments_bp
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+from flask_cors import CORS
+from flask_jwt_extended import JWTManager
 
-all_blueprints = [
-    auth_bp
-    # categories_bp,
-    # expenses_bp,
-    # household_bp,
-    # services_bp,
-    # payments_bp,
-]
+# Initialize extensions
+db = SQLAlchemy()
+migrate = Migrate()
+jwt = JWTManager()
+
+def create_app():
+    app = Flask(__name__)
+
+    # -------------------
+    # App configuration
+    # -------------------
+    app.config['SECRET_KEY'] = 'super-secret-key'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['JWT_SECRET_KEY'] = 'super-secret-jwt-key'
+
+    # -------------------
+    # Initialize extensions
+    # -------------------
+    db.init_app(app)
+    migrate.init_app(app, db)
+    jwt.init_app(app)
+    CORS(app)
+
+    # -------------------
+    # Import models so Alembic can detect them
+    # -------------------
+    from app.models import user, service
+    # household, expense, category, paymenthistory
+
+    # -------------------
+    # Register blueprints
+    # -------------------
+    from app.routes.auth import auth_bp
+    from app.routes.services import services_bp
+    app.register_blueprint(auth_bp, url_prefix="/auth")
+    app.register_blueprint(services_bp)
+
+    # Optional test route
+    @app.route('/')
+    def home():
+        return {"message": "Backend is running!"}
+
+    return app
