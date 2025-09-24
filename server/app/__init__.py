@@ -1,4 +1,3 @@
-
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -29,17 +28,18 @@ def create_app():
     jwt.init_app(app)
     CORS(app)
 
-    # -------------------
-    # Import models so Alembic can detect them
-    # -------------------
-    from app.models import user
-    # household, expense, category, service, paymenthistory
+    # Import models so migrations detect them
+    from app.models import user, service
+    # household, expense, category, paymenthistory (future)
 
     # -------------------
     # Register blueprints
     # -------------------
     from app.routes.auth import auth_bp
+    from app.routes.services import services_bp
+
     app.register_blueprint(auth_bp, url_prefix="/auth")
+    app.register_blueprint(services_bp, url_prefix="/services")
 
     # Optional test route
     @app.route('/')
