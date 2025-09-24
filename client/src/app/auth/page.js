@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Mail, Lock, User, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
-import { loginRequest, signupRequest, fetchCurrentUser } from "../../utils/api";
+import { loginRequest, signupRequest } from "../../utils/api";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -26,10 +26,8 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
     setLoading(true);
-
     try {
-      const { access_token } = await loginRequest(email, password);
-      const user = await fetchCurrentUser(access_token);
+      const { access_token, user } = await loginRequest(email, password); // <-- capture user
       login(access_token, user);
       router.push("/dashboard");
     } catch (err) {
@@ -44,19 +42,12 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
     setLoading(true);
-
     try {
-      const payload = {
-        username: fullName,
-        email,
-        password,
-        household_id: null, // adjust if needed
-      };
+      const payload = { username: fullName, email, password, household_id: null };
+      await signupRequest(payload);
 
-      await signupRequest(payload); // create user
       // Auto login after signup
-      const { access_token } = await loginRequest(email, password);
-      const user = await fetchCurrentUser(access_token);
+      const { access_token, user } = await loginRequest(email, password); // <-- capture user
       login(access_token, user);
       router.push("/dashboard");
     } catch (err) {
@@ -69,24 +60,14 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-black to-gray-900 px-4 relative overflow-hidden">
       <div className="relative w-full max-w-[450px] h-[550px] perspective-1000">
-        <div
-          className={`relative w-full h-full transition-transform duration-700 ease-in-out transform-style-3d ${
-            isActive ? "rotate-y-180" : ""
-          }`}
-        >
+        <div className={`relative w-full h-full transition-transform duration-700 ease-in-out transform-style-3d ${isActive ? "rotate-y-180" : ""}`} >
+          
           {/* LOGIN FORM - Front Side */}
           <div className="absolute w-full h-full backface-hidden">
             <div className="w-full h-full flex flex-col justify-center backdrop-blur-xl bg-white/5 border border-white/10 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] rounded-xl p-10">
-              <h1 className="mb-8 text-center text-4xl font-extrabold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                PayPlan
-              </h1>
-              <h2 className="mb-5 text-center text-2xl font-bold text-white">
-                Login
-              </h2>
-
-              {error && (
-                <p className="text-center text-red-400 text-sm mb-3">{error}</p>
-              )}
+              <h1 className="mb-8 text-center text-4xl font-extrabold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">PayPlan</h1>
+              <h2 className="mb-5 text-center text-2xl font-bold text-white">Login</h2>
+              {error && <p className="text-center text-red-400 text-sm mb-3">{error}</p>}
 
               <form onSubmit={handleLogin}>
                 <div className="mb-4 flex items-center gap-3 rounded-md backdrop-blur-sm bg-white/10 border border-white/20 px-4 py-3">
@@ -121,9 +102,7 @@ export default function LoginPage() {
 
                 <div className="mb-4 flex items-center">
                   <input type="checkbox" id="remember" className="mr-2" />
-                  <label htmlFor="remember" className="text-white/70 text-sm">
-                    Remember Me
-                  </label>
+                  <label htmlFor="remember" className="text-white/70 text-sm">Remember Me</label>
                 </div>
 
                 <button
@@ -152,16 +131,9 @@ export default function LoginPage() {
           {/* REGISTER FORM - Back Side */}
           <div className="absolute w-full h-full rotate-y-180 backface-hidden">
             <div className="w-full h-full flex flex-col justify-center backdrop-blur-xl bg-white/5 border border-white/10 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] rounded-xl p-10">
-              <h1 className="mb-8 text-center text-4xl font-extrabold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                PayPlan
-              </h1>
-              <h2 className="mb-5 text-center text-2xl font-bold text-white">
-                Create Account
-              </h2>
-
-              {error && (
-                <p className="text-center text-red-400 text-sm mb-3">{error}</p>
-              )}
+              <h1 className="mb-8 text-center text-4xl font-extrabold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">PayPlan</h1>
+              <h2 className="mb-5 text-center text-2xl font-bold text-white">Create Account</h2>
+              {error && <p className="text-center text-red-400 text-sm mb-3">{error}</p>}
 
               <form onSubmit={handleSignup}>
                 <div className="mb-4 flex items-center gap-3 rounded-md backdrop-blur-sm bg-white/10 border border-white/20 px-4 py-3">
@@ -235,6 +207,7 @@ export default function LoginPage() {
               </form>
             </div>
           </div>
+
         </div>
       </div>
     </div>

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Calendar, AlertTriangle } from "lucide-react";
 import PaymentItem from "../../components/PaymentItem";
 import Navbar from "../../components/Navbar";
-import { getDashboardData, markPaymentPaid } from "../../utils/api";
+//import { getDashboardData, markPaymentPaid } from "../../utils/api";
 
 export default function UpcomingPage() {
   const [upcomingPayments, setUpcomingPayments] = useState([]);

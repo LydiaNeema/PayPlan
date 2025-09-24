@@ -44,9 +44,6 @@ export async function loginRequest(email, password) {
   return request("/auth/signin", { method: "POST", body: { email, password } });
 }
 
-export async function fetchCurrentUser(token) {
-  return request("/auth/profile", { method: "GET", token });
-}
 
 // Dashboard / expenses requests
 export async function getExpenses(token) {
