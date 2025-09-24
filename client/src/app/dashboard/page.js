@@ -43,12 +43,13 @@ export default function DashboardPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [servicesData, upcomingData, overdueData, householdData] = await Promise.all([
-          getServices(token),
-          getUpcomingPayments(token),
-          getOverduePayments(token),
-          getHousehold(token),
-        ]);
+        const [servicesData, upcomingData, overdueData, householdData] =
+          await Promise.all([
+            getServices(token),
+            getUpcomingPayments(token),
+            getOverduePayments(token),
+            getHousehold(token),
+          ]);
 
         setServices(servicesData || []);
         setUpcomingPayments(upcomingData || []);
@@ -99,7 +100,9 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 px-6 py-6">
-      <Navbar />
+      <div className="-mx-6 -mt-6">
+        <Navbar />
+      </div>
 
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-white">
@@ -107,9 +110,7 @@ export default function DashboardPage() {
         </h1>
         <p className="text-white/70">Manage your recurring payments</p>
         {household && (
-          <p className="text-white/70 mt-1">
-            Household: {household.name}
-          </p>
+          <p className="text-white/70 mt-1">Household: {household.name}</p>
         )}
       </div>
 
@@ -227,9 +228,7 @@ export default function DashboardPage() {
       {/* Empty State */}
       {services.length === 0 && (
         <div className="text-center mt-20">
-          <h2 className="text-2xl font-bold text-white">
-            Welcome to PayPlan!
-          </h2>
+          <h2 className="text-2xl font-bold text-white">Welcome to PayPlan!</h2>
           <p className="text-white/70 mt-2">
             Start by adding your first subscription or recurring service.
           </p>
