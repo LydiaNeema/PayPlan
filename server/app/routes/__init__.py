@@ -13,4 +13,3 @@ all_blueprints = [
     services_bp
     # payments_bp,
 ]
-
