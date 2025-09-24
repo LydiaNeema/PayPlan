@@ -1,6 +1,6 @@
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:5000";
 
-// Generic request helper
+
 export async function request(path, { method = "GET", body, token, isForm = false } = {}) {
   const headers = {};
 
@@ -12,7 +12,10 @@ export async function request(path, { method = "GET", body, token, isForm = fals
     headers["Content-Type"] = "application/json";
   }
 
-  const res = await fetch(`${BASE_URL}${path}`, {
+
+  const url = `${BASE_URL}${path}`.replace(/([^:]\/)\/+/g, "$1");
+
+  const res = await fetch(url, {
     method,
     headers,
     body: body ? (isForm ? body : JSON.stringify(body)) : undefined,
@@ -34,7 +37,6 @@ export async function request(path, { method = "GET", body, token, isForm = fals
 
 // Auth requests
 export async function signupRequest(payload) {
-  // payload = { username, email, password, household_id? }
   return request("/auth/signup", { method: "POST", body: payload });
 }
 
@@ -63,7 +65,7 @@ export async function deleteExpense(id, token) {
   return request(`/expenses/${id}`, { method: "DELETE", token });
 }
 
-// Payments (optional for recurring services)
+// Payments 
 export async function getUpcomingPayments(token) {
   return request("/payments/upcoming", { method: "GET", token });
 }
@@ -76,7 +78,7 @@ export async function markPaymentAsPaid(paymentId, token) {
   return request(`/payments/${paymentId}/pay`, { method: "POST", token });
 }
 
-//  Services CRUD
+// Services CRUD
 export async function getServices(token) {
   return request("/services", { method: "GET", token });
 }
@@ -93,7 +95,7 @@ export async function deleteService(id, token) {
   return request(`/services/${id}`, { method: "DELETE", token });
 }
 
-//  Household support for DashboardPage
+// Household support for DashboardPage
 export async function getHousehold(token) {
   return request("/household", { method: "GET", token });
 }

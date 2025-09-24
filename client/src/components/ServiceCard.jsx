@@ -1,6 +1,6 @@
 "use client";
 
-import { Calendar, Wallet, Clock } from "lucide-react";
+import { Calendar, Wallet, Clock, Edit2, Trash2 } from "lucide-react";
 
 export default function ServiceCard({ service, onPress, showNextPayment = true, onEdit, onDelete }) {
   const handlePress = () => {
@@ -46,24 +46,24 @@ export default function ServiceCard({ service, onPress, showNextPayment = true, 
 
   return (
     <div
-      className="cursor-pointer rounded-xl overflow-hidden shadow-lg m-3 relative"
+      className="cursor-pointer rounded-xl overflow-hidden shadow-lg m-3 relative flex"
       style={{ background: `linear-gradient(to top right, ${service.color}, ${service.color}80)` }}
     >
       {/* Edit/Delete Buttons */}
-      <div className="absolute top-2 right-2 flex gap-2 z-10">
+      <div className="absolute top-1/2 right-2 transform -translate-y-1/2 flex gap-2 z-10">
         {onEdit && (
           <button onClick={(e) => { e.stopPropagation(); onEdit(service); }} className="p-1 hover:bg-white/10 rounded-full">
-            <Wallet size={20} className="text-blue-400" />
+            <Edit2 size={20} className="text-blue-400" />
           </button>
         )}
         {onDelete && (
           <button onClick={(e) => { e.stopPropagation(); onDelete(service.id); }} className="p-1 hover:bg-red-600/30 rounded-full">
-            <Wallet size={20} className="text-red-400" />
+            <Trash2 size={20} className="text-red-400" />
           </button>
         )}
       </div>
 
-      <div onClick={handlePress} className="p-5 flex flex-col gap-3">
+      <div onClick={handlePress} className="p-5 flex flex-col gap-3 w-full">
         {/* Header */}
         <div className="flex justify-between items-start">
           <div className="flex-1 mr-3">
