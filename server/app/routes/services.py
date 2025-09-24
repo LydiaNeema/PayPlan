@@ -5,21 +5,19 @@ from datetime import datetime
 
 services_bp = Blueprint("services", __name__)
 
+# CRUD for Services
 
 # GET all services
-
-@services_bp.route("/services", methods=["GET"])
+@services_bp.route("", methods=["GET"])
 def get_services():
     services = Service.query.all()
     return jsonify([s.to_dict() for s in services]), 200
 
 
-
-# CREATE a service
-
-@services_bp.route("/services", methods=["POST"])
+# CREATE a new service
+@services_bp.route("", methods=["POST"])
 def create_service():
-    data = request.get_json()
+    data = request.get_json() or {}
 
     try:
         next_due_date = None
@@ -50,12 +48,10 @@ def create_service():
         return jsonify({"error": str(e)}), 400
 
 
-
 # UPDATE a service
-
-@services_bp.route("/services/<int:id>", methods=["PUT", "PATCH"])
+@services_bp.route("/<int:id>", methods=["PUT", "PATCH"])
 def update_service(id):
-    data = request.get_json()
+    data = request.get_json() or {}
     service = Service.query.get_or_404(id)
 
     try:
@@ -88,10 +84,8 @@ def update_service(id):
         return jsonify({"error": str(e)}), 400
 
 
-
 # DELETE a service
-
-@services_bp.route("/services/<int:id>", methods=["DELETE"])
+@services_bp.route("/<int:id>", methods=["DELETE"])
 def delete_service(id):
     service = Service.query.get_or_404(id)
     try:
