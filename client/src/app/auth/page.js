@@ -10,7 +10,7 @@ export default function LoginPage() {
   const router = useRouter();
   const { login } = useAuth();
 
-  const [isActive, setIsActive] = useState(false); // toggle flip
+  const [isActive, setIsActive] = useState(false); // toggle slide
   const [showPassword, setShowPassword] = useState(false);
   const [showRegPassword, setShowRegPassword] = useState(false);
 
@@ -21,13 +21,12 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Handle login
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
     try {
-      const { access_token, user } = await loginRequest(email, password); // <-- capture user
+      const { access_token, user } = await loginRequest(email, password);
       login(access_token, user);
       router.push("/dashboard");
     } catch (err) {
@@ -37,17 +36,19 @@ export default function LoginPage() {
     }
   };
 
-  // Handle signup
   const handleSignup = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
     try {
-      const payload = { username: fullName, email, password, household_id: null };
+      const payload = {
+        username: fullName,
+        email,
+        password,
+        household_id: null,
+      };
       await signupRequest(payload);
-
-      // Auto login after signup
-      const { access_token, user } = await loginRequest(email, password); // <-- capture user
+      const { access_token, user } = await loginRequest(email, password);
       login(access_token, user);
       router.push("/dashboard");
     } catch (err) {
@@ -58,16 +59,26 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-black to-gray-900 px-4 relative overflow-hidden">
-      <div className="relative w-full max-w-[450px] h-[550px] perspective-1000">
-        <div className={`relative w-full h-full transition-transform duration-700 ease-in-out transform-style-3d ${isActive ? "rotate-y-180" : ""}`} >
-          
-          {/* LOGIN FORM - Front Side */}
-          <div className="absolute w-full h-full backface-hidden">
-            <div className="w-full h-full flex flex-col justify-center backdrop-blur-xl bg-white/5 border border-white/10 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] rounded-xl p-10">
-              <h1 className="mb-8 text-center text-4xl font-extrabold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">PayPlan</h1>
-              <h2 className="mb-5 text-center text-2xl font-bold text-white">Login</h2>
-              {error && <p className="text-center text-red-400 text-sm mb-3">{error}</p>}
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#1E3A8A] to-[#0A1A33] px-4 relative overflow-hidden">
+      <div className="relative w-[900px] h-[550px] bg-white/5 rounded-2xl shadow-xl overflow-hidden">
+        {/* Forms container */}
+        <div
+          className={`absolute top-0 left-0 h-full w-[200%] flex transition-transform duration-700 ease-in-out ${
+            isActive ? "-translate-x-1/2" : "translate-x-0"
+          }`}
+        >
+          {/* LOGIN FORM */}
+          <div className="w-1/2 h-full flex flex-col justify-center items-end px-10">
+            <div className="w-full max-w-sm">
+              <h1 className="mb-8 text-center text-4xl font-extrabold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                PayPlan
+              </h1>
+              <h2 className="mb-5 text-center text-2xl font-bold text-white">
+                Login
+              </h2>
+              {error && (
+                <p className="text-center text-red-400 text-sm mb-3">{error}</p>
+              )}
 
               <form onSubmit={handleLogin}>
                 <div className="mb-4 flex items-center gap-3 rounded-md backdrop-blur-sm bg-white/10 border border-white/20 px-4 py-3">
@@ -102,38 +113,34 @@ export default function LoginPage() {
 
                 <div className="mb-4 flex items-center">
                   <input type="checkbox" id="remember" className="mr-2" />
-                  <label htmlFor="remember" className="text-white/70 text-sm">Remember Me</label>
+                  <label htmlFor="remember" className="text-white/70 text-sm">
+                    Remember Me
+                  </label>
                 </div>
 
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full rounded-md bg-gradient-to-r from-red-600 to-red-700 px-4 py-3 font-bold text-white transition-all duration-300 hover:from-red-700 hover:to-red-800 disabled:opacity-50"
+                  className="w-full rounded-md bg-gradient-to-r from-[#1E3A8A] to-[#0A1A33] px-4 py-3 font-bold text-white transition-all duration-300 disabled:opacity-50"
                 >
                   {loading ? "Signing In..." : "Sign In"}
                 </button>
-
-                <div className="mt-6 text-center">
-                  <p className="text-white/70">
-                    New to PayPlan?{" "}
-                    <span
-                      onClick={() => setIsActive(true)}
-                      className="cursor-pointer font-bold text-white hover:text-red-400 transition-colors"
-                    >
-                      Sign up
-                    </span>
-                  </p>
-                </div>
               </form>
             </div>
           </div>
 
-          {/* REGISTER FORM - Back Side */}
-          <div className="absolute w-full h-full rotate-y-180 backface-hidden">
-            <div className="w-full h-full flex flex-col justify-center backdrop-blur-xl bg-white/5 border border-white/10 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] rounded-xl p-10">
-              <h1 className="mb-8 text-center text-4xl font-extrabold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">PayPlan</h1>
-              <h2 className="mb-5 text-center text-2xl font-bold text-white">Create Account</h2>
-              {error && <p className="text-center text-red-400 text-sm mb-3">{error}</p>}
+          {/* REGISTER FORM */}
+          <div className="w-1/2 h-full flex flex-col justify-center items-start px-10">
+            <div className="w-full max-w-sm">
+              <h1 className="mb-8 text-center text-4xl font-extrabold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                PayPlan
+              </h1>
+              <h2 className="mb-5 text-center text-2xl font-bold text-white">
+                Create Account
+              </h2>
+              {error && (
+                <p className="text-center text-red-400 text-sm mb-3">{error}</p>
+              )}
 
               <form onSubmit={handleSignup}>
                 <div className="mb-4 flex items-center gap-3 rounded-md backdrop-blur-sm bg-white/10 border border-white/20 px-4 py-3">
@@ -188,26 +195,48 @@ export default function LoginPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full rounded-md bg-gradient-to-r from-red-600 to-red-700 px-4 py-3 font-bold text-white transition-all duration-300 hover:from-red-700 hover:to-red-800 disabled:opacity-50"
+                  className="w-full rounded-md bg-gradient-to-r from-[#1E3A8A] to-[#0A1A33] px-4 py-3 font-bold text-white transition-all duration-300 disabled:opacity-50"
                 >
                   {loading ? "Creating..." : "Sign Up"}
                 </button>
-
-                <div className="mt-6 text-center">
-                  <p className="text-white/70">
-                    Already have an account?{" "}
-                    <span
-                      onClick={() => setIsActive(false)}
-                      className="cursor-pointer font-bold text-white hover:text-red-400 transition-colors"
-                    >
-                      Sign in
-                    </span>
-                  </p>
-                </div>
               </form>
             </div>
           </div>
+        </div>
 
+        {/* Overlay panel */}
+        <div
+          className={`absolute top-0 left-0 w-1/2 h-full overflow-hidden transition-all duration-700 ease-in-out ${
+            isActive
+              ? "translate-x-full rounded-l-[100%]"
+              : "translate-x-0 rounded-r-[100%]"
+          }`}
+        >
+          <div className="w-full h-full bg-gradient-to-br from-[#1E3A8A] to-[#0A1A33] flex flex-col items-center justify-center text-white px-6 text-center">
+            {!isActive ? (
+              <>
+                <h2 className="text-3xl font-bold mb-4">Hello, Welcome!</h2>
+                <p className="mb-6 text-white/80">Don’t have an account?</p>
+                <button
+                  onClick={() => setIsActive(true)}
+                  className="px-6 py-2 rounded-full bg-white text-[#0A1A33] font-semibold shadow hover:bg-gray-200 transition"
+                >
+                  Sign Up
+                </button>
+              </>
+            ) : (
+              <>
+                <h2 className="text-3xl font-bold mb-4">Welcome Back!</h2>
+                <p className="mb-6 text-white/80">Already have an account?</p>
+                <button
+                  onClick={() => setIsActive(false)}
+                  className="px-6 py-2 rounded-full bg-white text-[#0A1A33] font-semibold shadow hover:bg-gray-200 transition"
+                >
+                  Sign In
+                </button>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </div>
