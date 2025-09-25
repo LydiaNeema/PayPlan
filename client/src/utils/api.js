@@ -96,3 +96,9 @@ export async function deleteService(id, token) {
 export async function getHousehold(token) {
   return request("/household", { method: "GET", token });
 }
+
+//history
+// Payment History
+export async function getPaymentHistory(token) {
+  return request("/payments", { method: "GET", token });
+}

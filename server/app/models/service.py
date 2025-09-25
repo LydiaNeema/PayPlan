@@ -12,6 +12,11 @@ class Service(db.Model):
     color = db.Column(db.String(20))       # UI color
     next_due_date = db.Column(db.DateTime, default=datetime.utcnow)
 
+    # Relationships
+    payment_history = db.relationship(
+        "PaymentHistory", back_populates="service", cascade="all, delete-orphan"
+    )
+
     def to_dict(self):
         return {
             "id": self.id,
@@ -20,5 +25,5 @@ class Service(db.Model):
             "description": self.description,
             "frequency": self.frequency,
             "color": self.color,
-            "nextDueDate": self.next_due_date.isoformat() if self.next_due_date else None
+            "nextDueDate": self.next_due_date.isoformat() if self.next_due_date else None,
         }
