@@ -1,4 +1,4 @@
-from app.extensions import db
+from app import db
 
 class Expense(db.Model):
     __tablename__ = "expenses"

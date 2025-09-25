@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from app import db
-from models.expense import Expense
+from app.models.expense import Expense
 
 expenses_bp = Blueprint("expenses", __name__, url_prefix="/expenses")
 
