@@ -1,5 +1,6 @@
 import "./globals.css";
 import { AuthProvider } from "../context/AuthContext";
+import Preloader from "../components/Preloader";
 
 export const metadata = {
   title: "PayPlan",
@@ -11,7 +12,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white">
         <AuthProvider>
-          <main className="w-full min-h-screen">{children}</main>
+          <Preloader>{children}</Preloader>
         </AuthProvider>
       </body>
     </html>
