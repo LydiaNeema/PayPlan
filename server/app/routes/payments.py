@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from app import db
-from models.paymenthistory import PaymentHistory
+from app.models.paymenthistory import PaymentHistory
 
 payments_bp = Blueprint("payments", __name__, url_prefix="/payments")
 

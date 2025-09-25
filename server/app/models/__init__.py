@@ -1,6 +1,25 @@
 from flask import Flask
 from app.extensions import db, migrate, api
 
+# Explicit imports so Alembic can see them
+from .user import User
+from .household import Household
+from .expense import Expense
+from .category import Category
+from .service import Service
+from .paymenthistory import PaymentHistory
+
+__all__ = [
+    "User",
+    "Household",
+    "Expense",
+    "Category",
+    "Service",
+    "PaymentHistory",
+    "db",
+    "create_app",
+]
+
 def create_app():
     app = Flask(__name__)
     app.config.from_object("app.config")  # load settings
