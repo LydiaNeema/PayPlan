@@ -16,7 +16,7 @@ export default function StatsCard({
         borderColor: color,
         borderWidth: "1.5px",
       }}
-    >
+    >      
       <div className="flex flex-col justify-between h-full">
         <div className="flex items-center gap-2 mb-2">
           <div className="w-6 h-6 flex items-center justify-center" style={{ color }}>
@@ -35,6 +35,7 @@ export default function StatsCard({
           </p>
         )}
       </div>
+      
     </div>
   );
 }
