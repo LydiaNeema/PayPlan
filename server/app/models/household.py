@@ -1,7 +1,7 @@
-from app.extensions import db
+from app import db
 
 class Household(db.Model):
-    _tablename_ = "households"
+    __tablename__ = "households"
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)

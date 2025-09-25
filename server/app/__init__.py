@@ -1,17 +1,17 @@
 from flask import Flask
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
-from .extensions import db, migrate, api
+from .config import db, migrate, api, SQLALCHEMY_DATABASE_URI, SQLALCHEMY_TRACK_MODIFICATIONS
 
 # ------------------- Create App -------------------
 def create_app():
-    app = Flask(_name_)
+    app = Flask(__name__)  
 
     # ------------------- Config -------------------
     app.config['SECRET_KEY'] = 'super-secret-key'
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///instance/app.db'  # unified path
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['JWT_SECRET_KEY'] = 'super-secret-jwt-key'
+    app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = SQLALCHEMY_TRACK_MODIFICATIONS
 
     # ------------------- Extensions -------------------
     db.init_app(app)
@@ -21,7 +21,12 @@ def create_app():
     CORS(app)
 
     # ------------------- Import models -------------------
-    from app.models import user, service, paymenthistory, expense, household, category
+    from app.models.user import User
+    from app.models.service import Service
+    from app.models.paymenthistory import PaymentHistory
+    from app.models.expense import Expense
+    from app.models.household import Household
+    from app.models.category import Category
 
     # ------------------- Register blueprints -------------------
     from app.routes.auth import auth_bp
@@ -31,12 +36,20 @@ def create_app():
     from app.routes.household import household_bp
     from app.routes.categories import categories_bp
 
+    # ✅ New imports
+    from app.routes.dashboard import dashboard_bp
+    from app.routes.history import history_bp
+
     app.register_blueprint(auth_bp, url_prefix="/auth")
     app.register_blueprint(services_bp, url_prefix="/services")
     app.register_blueprint(payments_bp, url_prefix="/payments")
     app.register_blueprint(expenses_bp, url_prefix="/expenses")
-    app.register_blueprint(household_bp, url_prefix="/households")
+    app.register_blueprint(household_bp, url_prefix="/household")
     app.register_blueprint(categories_bp, url_prefix="/categories")
+
+    # ✅ New blueprints
+    app.register_blueprint(dashboard_bp, url_prefix="/dashboard")
+    app.register_blueprint(history_bp, url_prefix="/history")
 
     # ------------------- Optional Test Route -------------------
     @app.route('/')

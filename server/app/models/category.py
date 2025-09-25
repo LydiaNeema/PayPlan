@@ -1,7 +1,7 @@
-from app.extensions import db
+from app import db
 
 class Category(db.Model):
-    _tablename_ = "categories"
+    __tablename__ = "categories"
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), nullable=False, unique=True)

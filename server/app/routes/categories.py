@@ -3,7 +3,7 @@ from app.extensions import db
 from app.models.category import Category
 
 # Blueprint for categories
-categories_bp = Blueprint("categories", _name_, url_prefix="/categories")
+categories_bp = Blueprint("categories", __name__, url_prefix="/categories")
 
 # ---------------- CREATE a new category ----------------
 @categories_bp.route("/", methods=["POST"])

@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from app import db
 from app.models.household import Household
 
-household_bp = Blueprint("household", __name__, url_prefix="/households")
+household_bp = Blueprint("household", __name__, url_prefix="/household")
 
 @household_bp.route("/", methods=["POST"])
 def create_household():
