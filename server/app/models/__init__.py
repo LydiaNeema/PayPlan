@@ -9,7 +9,7 @@ from .category import Category
 from .service import Service
 from .paymenthistory import PaymentHistory
 
-__all__ = [
+_all_ = [
     "User",
     "Household",
     "Expense",
@@ -21,7 +21,7 @@ __all__ = [
 ]
 
 def create_app():
-    app = Flask(__name__)
+    app = Flask(_name_)
     app.config.from_object("app.config")  # load settings
 
     # Initialize extensions

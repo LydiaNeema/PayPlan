@@ -5,7 +5,7 @@ from .extensions import db, migrate, api
 
 # ------------------- Create App -------------------
 def create_app():
-    app = Flask(__name__)
+    app = Flask(_name_)
 
     # ------------------- Config -------------------
     app.config['SECRET_KEY'] = 'super-secret-key'

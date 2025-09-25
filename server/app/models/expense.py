@@ -1,7 +1,7 @@
 from app.extensions import db
 
 class Expense(db.Model):
-    __tablename__ = "expenses"
+    _tablename_ = "expenses"
 
     id = db.Column(db.Integer, primary_key=True)
     amount = db.Column(db.Float, nullable=False)

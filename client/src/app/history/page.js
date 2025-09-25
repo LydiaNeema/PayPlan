@@ -1,12 +1,13 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
 import { Clock, CheckCircle } from "lucide-react";
 import Navbar from "../../components/Navbar";
-import { getDashboardData } from "../../utils/api";
+import { getPaymentHistory } from "../../utils/api";
+import { useAuth } from "../../context/AuthContext";
 
 export default function HistoryPage() {
+  const { token } = useAuth();
   const [paidPayments, setPaidPayments] = useState([]);
   const [filter, setFilter] = useState("all");
   const [loading, setLoading] = useState(true);
@@ -14,8 +15,8 @@ export default function HistoryPage() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const data = await getDashboardData();
-      setPaidPayments(data.paidPayments || []);
+      const data = await getPaymentHistory(token);
+      setPaidPayments(data || []);
     } catch (error) {
       console.error("Error loading payment history:", error);
     } finally {
@@ -36,11 +37,11 @@ export default function HistoryPage() {
     };
     switch (filter) {
       case "last-30":
-        return paidPayments.filter((p) => new Date(p.paidDate || p.dueDate) >= filterDate(30));
+        return paidPayments.filter((p) => new Date(p.dueDate) >= filterDate(30));
       case "last-90":
-        return paidPayments.filter((p) => new Date(p.paidDate || p.dueDate) >= filterDate(90));
+        return paidPayments.filter((p) => new Date(p.dueDate) >= filterDate(90));
       case "this-year":
-        return paidPayments.filter((p) => new Date(p.paidDate || p.dueDate) >= new Date(now.getFullYear(), 0, 1));
+        return paidPayments.filter((p) => new Date(p.dueDate) >= new Date(now.getFullYear(), 0, 1));
       default:
         return paidPayments;
     }
@@ -135,8 +136,8 @@ export default function HistoryPage() {
           filteredPayments
             .sort(
               (a, b) =>
-                new Date(b.paidDate || b.dueDate).getTime() -
-                new Date(a.paidDate || a.dueDate).getTime()
+                new Date(b.dueDate).getTime() -
+                new Date(a.dueDate).getTime()
             )
             .map((payment) => (
               <div
@@ -146,8 +147,7 @@ export default function HistoryPage() {
                 <div>
                   <p className="font-semibold text-white">{payment.serviceName}</p>
                   <p className="text-sm text-gray-400">
-                    Paid on{" "}
-                    {new Date(payment.paidDate || payment.dueDate).toLocaleDateString()}
+                    Paid on {new Date(payment.dueDate).toLocaleDateString()}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">

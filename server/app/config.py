@@ -15,7 +15,7 @@ api = Api()
 
 # ------------------- Create App -------------------
 def create_app():
-    app = Flask(__name__)
+    app = Flask(_name_)
     
     # ------------------- Config -------------------
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///instance/app.db'  # unified path

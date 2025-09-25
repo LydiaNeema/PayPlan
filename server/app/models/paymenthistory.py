@@ -2,7 +2,7 @@ from app.extensions import db
 from datetime import date
 
 class PaymentHistory(db.Model):
-    __tablename__ = "payment_history"
+    _tablename_ = "payment_history"
 
     id = db.Column(db.Integer, primary_key=True)
     service_id = db.Column(db.Integer, db.ForeignKey("services.id"), nullable=False)

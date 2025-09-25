@@ -11,5 +11,5 @@ all_blueprints = [
     expenses_bp,
     household_bp,
     services_bp,
-    payments_bp,
+    payments_bp
 ]
