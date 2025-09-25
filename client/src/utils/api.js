@@ -97,8 +97,16 @@ export async function getHousehold(token) {
   return request("/household", { method: "GET", token });
 }
 
-//history
-// Payment History
-export async function getPaymentHistory(token) {
-  return request("/payments", { method: "GET", token });
+// Household & members
+// export async function getHousehold(token) {
+//   return request("/household/", { method: "GET", token });
+// }
+export async function createMember(payload, token) {
+  return request("/household/members", { method: "POST", body: payload, token });
+}
+export async function updateMember(id, payload, token) {
+  return request(`/household/members/${id}`, { method: "PATCH", body: payload, token });
+}
+export async function deleteMember(id, token) {
+  return request(`/household/members/${id}`, { method: "DELETE", token });
 }

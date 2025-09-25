@@ -24,88 +24,21 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
-
-/* Blob Animation */
-@keyframes blob {
-  0% {
-    transform: translate(0px, 0px) scale(1);
-  }
-  33% {
-    transform: translate(30px, -50px) scale(1.1);
-  }
-  66% {
-    transform: translate(-20px, 20px) scale(0.9);
-  }
-  100% {
-    transform: translate(0px, 0px) scale(1);
-  }
+/* Overlay panel shape */
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(to bottom right, #1E3A8A, #0A1A33);
+  border-radius: 0 100px 100px 0;
+  transition: transform 0.7s ease-in-out;
+  z-index: 5;
 }
 
-.animate-blob {
-  animation: blob 7s infinite;
-}
-
-.animation-delay-2000 {
-  animation-delay: 2s;
-}
-
-.animation-delay-4000 {
-  animation-delay: 4s;
-}
-
-/* 3D Flip Animation Utilities */
-.perspective-1000 {
-  perspective: 1000px;
-}
-
-.transform-style-3d {
-  transform-style: preserve-3d;
-}
-
-.backface-hidden {
-  backface-visibility: hidden;
-}
-
-.rotate-y-180 {
-  transform: rotateY(180deg);
-}
-
-/* Password Input Wrapper Fix for 3D Flip */
-.register-password-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem; /* spacing between icon and input */
-  padding: 0.75rem 1rem; /* vertical + horizontal padding */
-  background-color: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 0.5rem;
-
-  transition: all 0.3s ease;
-  z-index: 1; /* ensures it stays inside the form */
-}
-
-/* Make input fill available space */
-.register-password-wrapper input {
-  flex: 1;
-  background: transparent;
-  color: white;
-  outline: none;
-  border: none;
-  font-size: 1rem;
-  z-index: 1;
-}
-
-/* Eye toggle icon inside input */
-.register-password-wrapper span {
-  z-index: 2;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-}
-
-/* Optional hover effect for eye icon */
-.register-password-wrapper span:hover {
-  color: #fff;
+.overlay.active {
+  transform: translateX(100%);
+  border-radius: 100px 0 0 100px;
 }
 
