@@ -27,6 +27,7 @@ def create_app():
     from app.models.expense import Expense
     from app.models.household import Household
     from app.models.category import Category
+    
 
     # ------------------- Register blueprints -------------------
     from app.routes.auth import auth_bp
@@ -35,6 +36,7 @@ def create_app():
     from app.routes.expenses import expenses_bp
     from app.routes.household import household_bp
     from app.routes.categories import categories_bp
+    from app.routes.history import history_bp
 
     # ✅ New imports
     from app.routes.dashboard import dashboard_bp
@@ -46,6 +48,7 @@ def create_app():
     app.register_blueprint(expenses_bp, url_prefix="/expenses")
     app.register_blueprint(household_bp, url_prefix="/household")
     app.register_blueprint(categories_bp, url_prefix="/categories")
+    
 
     # ✅ New blueprints
     app.register_blueprint(dashboard_bp, url_prefix="/dashboard")

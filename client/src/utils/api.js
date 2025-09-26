@@ -4,7 +4,7 @@ export async function request(path, { method = "GET", body, token, isForm = fals
   const headers = {};
 
   if (token && !isForm) {
-    headers["Authorization"] = `Bearer ${token}`; // ✅ fixed template string
+    headers["Authorization"] = `Bearer ${token}`;
   }
 
   if (!isForm) {
@@ -42,25 +42,7 @@ export async function loginRequest(email, password) {
   return request("/auth/signin", { method: "POST", body: { email, password } });
 }
 
-// -------------------- Expenses --------------------
-export async function getExpenses(token) {
-  return request("/expenses", { method: "GET", token });
-}
-
-export async function createExpense(payload, token) {
-  return request("/expenses", { method: "POST", body: payload, token });
-}
-
-export async function updateExpense(id, payload, token) {
-  return request(`/expenses/${id}`, { method: "PATCH", body: payload, token });
-}
-
-export async function deleteExpense(id, token) {
-  return request(`/expenses/${id}`, { method: "DELETE", token }); 
-}
-
-// Payments
-
+// -------------------- Payments --------------------
 export async function getUpcomingPayments(token) {
   return request("/payments/upcoming", { method: "GET", token });
 }
@@ -73,7 +55,12 @@ export async function createPayment(payload, token) {
   return request("/payments", { method: "POST", body: payload, token });
 }
 
-// utils/api.js
+
+export async function getPaidPayments(token) {
+  // use '/history' (no trailing slash) to avoid redirect/preflight problems
+  return request("/history", { method: "GET", token });
+}
+
 // PATCH partial/full payment
 export async function markPaymentAsPaid(paymentId, token, amount) {
   return request(`/payments/${paymentId}/pay`, {
@@ -82,8 +69,6 @@ export async function markPaymentAsPaid(paymentId, token, amount) {
     token
   });
 }
-
-
 
 // -------------------- Services --------------------
 export async function getServices(token) {
@@ -119,7 +104,7 @@ export async function deleteMember(id, token) {
   return request(`/household/members/${id}`, { method: "DELETE", token });
 }
 
-// -------------------- Dashboard (used in your pages) --------------------
+// -------------------- Dashboard --------------------
 export async function getDashboardData(token) {
   const [upcomingPayments, overduePayments, paidPayments] = await Promise.all([
     getUpcomingPayments(token),
