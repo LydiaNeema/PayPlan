@@ -6,6 +6,7 @@ import Navbar from "../../components/Navbar";
 import { useAuth } from "../../context/AuthContext";
 import { getDashboardData } from "../../utils/api";
 
+
 export default function HistoryPage() {
   const { user } = useAuth();
 
