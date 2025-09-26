@@ -5,7 +5,35 @@ from datetime import date, timedelta
 
 payments_bp = Blueprint("payments", __name__, url_prefix="/payments")
 
-# PATCH: Mark payment as paid (partial or full)
+# -------------------------
+# GET: Upcoming Payments
+# -------------------------
+@payments_bp.route("/upcoming", methods=["GET"])
+def get_upcoming():
+    today = date.today()
+    payments = PaymentHistory.query.filter(
+        PaymentHistory.due_date >= today,
+        PaymentHistory.paid == False
+    ).all()
+    return jsonify([p.to_dict() for p in payments]), 200
+
+
+# -------------------------
+# GET: Overdue Payments
+# -------------------------
+@payments_bp.route("/overdue", methods=["GET"])
+def get_overdue():
+    today = date.today()
+    payments = PaymentHistory.query.filter(
+        PaymentHistory.due_date < today,
+        PaymentHistory.paid == False
+    ).all()
+    return jsonify([p.to_dict() for p in payments]), 200
+
+
+# -------------------------
+# PATCH: Mark partial/full payment
+# -------------------------
 @payments_bp.route("/<int:id>/pay", methods=["PATCH"])
 def mark_paid(id):
     data = request.get_json() or {}
@@ -22,14 +50,14 @@ def mark_paid(id):
     if payment_amount > payment.amount:
         return jsonify({"error": "Payment exceeds remaining amount"}), 400
 
-    # Subtract the partial amount
+    # subtract partial amount
     payment.amount -= payment_amount
 
-    # Only mark fully paid if amount reaches zero
+    # fully paid?
     if payment.amount == 0:
         payment.paid = True
 
-        # Schedule next payment for recurring services
+        # schedule next if recurring
         if payment.service and payment.service.frequency:
             next_due = None
             if payment.service.frequency == "monthly":
@@ -43,7 +71,7 @@ def mark_paid(id):
                 new_payment = PaymentHistory(
                     service_id=payment.service.id,
                     user_id=payment.user_id,
-                    amount=payment.service.amount,
+                    amount=payment.service.amount,  # reset to full
                     due_date=next_due,
                     category=payment.service.category,
                     color=payment.service.color,
