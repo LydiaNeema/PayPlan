@@ -10,7 +10,7 @@ class User(db.Model):
     password_hash = db.Column(db.String(256), nullable=False)
 
     # Foreign key
-    household_id = db.Column(db.Integer, db.ForeignKey("households.id"))  # user belongs to 1 household
+    household_id = db.Column(db.Integer, db.ForeignKey("households.id"))
 
     # Relationships
     household = db.relationship("Household", back_populates="users")
@@ -24,7 +24,6 @@ class User(db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-    # Serialize method
     def to_dict(self):
         return {
             "id": self.id,

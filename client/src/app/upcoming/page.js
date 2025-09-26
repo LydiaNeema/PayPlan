@@ -2,16 +2,23 @@
 
 import { useEffect, useState } from "react";
 import { Calendar, AlertTriangle, Search, Bell } from "lucide-react";
-import PaymentItem from "../../components/PaymentItem";
 import Navbar from "../../components/Navbar";
+import PaymentItem from "../../components/PaymentItem";
+import FormikPaymentForm from "../../components/FormikPaymentForm";
+import {
+  getUpcomingPayments,
+  getOverduePayments,
+  createPayment,
+  markPaymentAsPaid,
+} from "../../utils/api";
 import { useAuth } from "../../context/AuthContext";
 import { getDashboardData } from "../../utils/api"; 
 
 export default function UpcomingPage() {
   const { user } = useAuth();
 
-  const [upcomingPayments, setUpcomingPayments] = useState([]);
-  const [overduePayments, setOverduePayments] = useState([]);
+  const [upcoming, setUpcoming] = useState([]);
+  const [overdue, setOverdue] = useState([]);
   const [filter, setFilter] = useState("all");
   const [loading, setLoading] = useState(true);
 
@@ -49,41 +56,33 @@ export default function UpcomingPage() {
 
     switch (filter) {
       case "overdue":
-        return overduePayments;
+        return overdue;
       case "due-soon":
-        return upcomingPayments.filter(
-          (p) => new Date(p.dueDate) <= threeDaysFromNow
-        );
+        return upcoming.filter((p) => new Date(p.dueDate) <= threeDaysFromNow);
       case "upcoming":
-        return upcomingPayments.filter(
-          (p) => new Date(p.dueDate) > threeDaysFromNow
-        );
+        return upcoming.filter((p) => new Date(p.dueDate) > threeDaysFromNow);
       default:
-        const allPayments = [...overduePayments, ...upcomingPayments];
-        const uniquePayments = allPayments.filter(
-          (payment, index, array) =>
-            array.findIndex((p) => p.id === payment.id) === index
+        const allPayments = [...overdue, ...upcoming];
+        const unique = allPayments.filter(
+          (p, idx, arr) => arr.findIndex((x) => x.id === p.id) === idx
         );
-        return uniquePayments.sort(
-          (a, b) => new Date(a.dueDate) - new Date(b.dueDate)
-        );
+        return unique.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
     }
   };
 
   const filteredPayments = getFilteredPayments();
 
-  const allUniquePayments = [...overduePayments, ...upcomingPayments].filter(
-    (payment, index, array) =>
-      array.findIndex((p) => p.id === payment.id) === index
+  const allUniquePayments = [...overdue, ...upcoming].filter(
+    (p, idx, arr) => arr.findIndex((x) => x.id === p.id) === idx
   );
 
   const filterOptions = [
     { key: "all", label: "All", count: allUniquePayments.length },
-    { key: "overdue", label: "Overdue", count: overduePayments.length },
+    { key: "overdue", label: "Overdue", count: overdue.length },
     {
       key: "due-soon",
       label: "Due Soon",
-      count: upcomingPayments.filter(
+      count: upcoming.filter(
         (p) =>
           new Date(p.dueDate) <=
           new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
@@ -92,7 +91,7 @@ export default function UpcomingPage() {
     {
       key: "upcoming",
       label: "Upcoming",
-      count: upcomingPayments.filter(
+      count: upcoming.filter(
         (p) =>
           new Date(p.dueDate) >
           new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
@@ -219,7 +218,8 @@ export default function UpcomingPage() {
                 >
                   <PaymentItem
                     payment={payment}
-                    onMarkAsPaid={markPaymentAsPaid}
+                    onMarkAsPaid={handleMarkAsPaid}
+                    onAddPayment={handleAddPayment}
                   />
                 </div>
               ))}
@@ -227,6 +227,22 @@ export default function UpcomingPage() {
           )}
         </div>
       </div>
+
+      {/* Add Payment Modal */}
+      {showForm && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/70 z-50">
+          <div className="bg-gray-900 p-6 rounded-xl w-full max-w-lg">
+            <FormikPaymentForm
+              initialValues={{
+                amount: selectedPayment?.amount || "",
+                dueDate: new Date().toISOString().split("T")[0],
+              }}
+              onSubmit={handleSubmit}
+              onCancel={() => setShowForm(false)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -59,7 +59,8 @@ export async function deleteExpense(id, token) {
   return request(`/expenses/${id}`, { method: "DELETE", token }); 
 }
 
-// -------------------- Payments --------------------
+// Payments
+
 export async function getUpcomingPayments(token) {
   return request("/payments/upcoming", { method: "GET", token });
 }
@@ -68,14 +69,18 @@ export async function getOverduePayments(token) {
   return request("/payments/overdue", { method: "GET", token });
 }
 
-export async function markPaymentAsPaid(paymentId, token) {
-  return request(`/payments/${paymentId}/pay`, { method: "POST", token }); 
+export async function createPayment(payload, token) {
+  return request("/payments", { method: "POST", body: payload, token });
 }
 
-// For HistoryPage
-export async function getPaidPayments(token) {
-  return request("/payments/history", { method: "GET", token });
+// utils/api.js
+export async function markPaymentAsPaid(paymentId, token, amount) {
+  return request(`/payments/${paymentId}/pay`, {
+    method: "PATCH",
+    body: { amount },  
+  });
 }
+
 
 // -------------------- Services --------------------
 export async function getServices(token) {
