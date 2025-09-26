@@ -1,168 +1,59 @@
 "use client";
-
-import React, { useEffect, useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { createExpense } from "../utils/api";
+import { X, Check, Calendar, Wallet } from "lucide-react";
 
-export default function FormikPaymentForm({ onSubmitSuccess }) {
-  const [categories, setCategories] = useState([]);
-  const [households, setHouseholds] = useState([]);
+const PaymentSchema = Yup.object().shape({
+  amount: Yup.number().positive().required("Amount required"),
+  dueDate: Yup.date().required("Due date required"),
+});
 
-  useEffect(() => {
-    fetch("/categories")
-      .then((res) => res.json())
-      .then((data) => setCategories(data));
-
-    fetch("/households")
-      .then((res) => res.json())
-      .then((data) => setHouseholds(data));
-  }, []);
-
+export default function FormikPaymentForm({ initialValues, onSubmit, onCancel }) {
   return (
-    <div className="payment-form mb-6">
-      <h2 className="text-xl font-semibold mb-3">Add New Payment</h2>
-
-      <Formik
-        initialValues={{
-          amount: "",
-          description: "",
-          category_id: "",
-          date: "",
-          household_id: "",
-          user_id: ""
-        }}
-        validationSchema={Yup.object({
-          amount: Yup.number()
-            .positive("Amount must be positive")
-            .required("Amount is required"),
-          date: Yup.date().required("Date is required"),
-          category_id: Yup.number().required("Category is required"),
-          household_id: Yup.number().required("Household is required"),
-          user_id: Yup.number().required("User ID is required"),
-        })}
-        onSubmit={async (values, { resetForm, setSubmitting }) => {
-          try {
-            await createExpense(values);
-            resetForm();
-            if (onSubmitSuccess) onSubmitSuccess();
-          } catch (error) {
-            console.error("Error creating expense:", error);
-          } finally {
-            setSubmitting(false);
-          }
-        }}
-      >
-        {({ isSubmitting }) => (
-          <Form className="space-y-4 border rounded-lg p-4 shadow-md">
-            <div>
-              <label className="block font-medium">Amount</label>
+    <Formik
+      initialValues={initialValues}
+      validationSchema={PaymentSchema}
+      onSubmit={onSubmit}
+    >
+      {({ isSubmitting }) => (
+        <Form className="space-y-6 p-6 bg-white/10 rounded-xl">
+          <div>
+            <label className="block mb-1 font-semibold">Amount</label>
+            <div className="flex items-center bg-white/5 p-2 rounded-lg">
+              <Wallet className="text-gray-400 mr-2" />
               <Field
+                name="amount"
                 type="number"
-                name="amount"
-                className="w-full border px-3 py-2 rounded-md"
-              />
-              <ErrorMessage
-                name="amount"
-                component="div"
-                className="text-red-500 text-sm"
+                placeholder="KES 0.00"
+                className="flex-1 bg-transparent outline-none"
               />
             </div>
+            <ErrorMessage name="amount" component="div" className="text-red-400 text-sm" />
+          </div>
 
-            <div>
-              <label className="block font-medium">Description</label>
+          <div>
+            <label className="block mb-1 font-semibold">Due Date</label>
+            <div className="flex items-center bg-white/5 p-2 rounded-lg">
+              <Calendar className="text-gray-400 mr-2" />
               <Field
-                type="text"
-                name="description"
-                className="w-full border px-3 py-2 rounded-md"
-              />
-              <ErrorMessage
-                name="description"
-                component="div"
-                className="text-red-500 text-sm"
-              />
-            </div>
-
-            <div>
-              <label className="block font-medium">Category</label>
-              <Field
-                as="select"
-                name="category_id"
-                className="w-full border px-3 py-2 rounded-md"
-              >
-                <option value="">Select Category</option>
-                {categories.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
-                  </option>
-                ))}
-              </Field>
-              <ErrorMessage
-                name="category_id"
-                component="div"
-                className="text-red-500 text-sm"
-              />
-            </div>
-
-            <div>
-              <label className="block font-medium">Household</label>
-              <Field
-                as="select"
-                name="household_id"
-                className="w-full border px-3 py-2 rounded-md"
-              >
-                <option value="">Select Household</option>
-                {households.map((h) => (
-                  <option key={h.id} value={h.id}>
-                    {h.name}
-                  </option>
-                ))}
-              </Field>
-              <ErrorMessage
-                name="household_id"
-                component="div"
-                className="text-red-500 text-sm"
-              />
-            </div>
-
-            <div>
-              <label className="block font-medium">Date</label>
-              <Field
+                name="dueDate"
                 type="date"
-                name="date"
-                className="w-full border px-3 py-2 rounded-md"
-              />
-              <ErrorMessage
-                name="date"
-                component="div"
-                className="text-red-500 text-sm"
+                className="flex-1 bg-transparent outline-none"
               />
             </div>
+            <ErrorMessage name="dueDate" component="div" className="text-red-400 text-sm" />
+          </div>
 
-            <div>
-              <label className="block font-medium">User ID</label>
-              <Field
-                type="number"
-                name="user_id"
-                className="w-full border px-3 py-2 rounded-md"
-              />
-              <ErrorMessage
-                name="user_id"
-                component="div"
-                className="text-red-500 text-sm"
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition"
-            >
-              {isSubmitting ? "Saving..." : "Add Payment"}
+          <div className="flex justify-between">
+            <button type="button" onClick={onCancel} className="px-4 py-2 rounded-lg bg-red-500/20 text-red-400">
+              <X />
             </button>
-          </Form>
-        )}
-      </Formik>
-    </div>
+            <button type="submit" disabled={isSubmitting} className="px-4 py-2 rounded-lg bg-green-600 text-white">
+              <Check />
+            </button>
+          </div>
+        </Form>
+      )}
+    </Formik>
   );
 }
