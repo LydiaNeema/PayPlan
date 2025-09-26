@@ -74,12 +74,15 @@ export async function createPayment(payload, token) {
 }
 
 // utils/api.js
+// PATCH partial/full payment
 export async function markPaymentAsPaid(paymentId, token, amount) {
   return request(`/payments/${paymentId}/pay`, {
     method: "PATCH",
-    body: { amount },  
+    body: { amount },
+    token
   });
 }
+
 
 
 // -------------------- Services --------------------
