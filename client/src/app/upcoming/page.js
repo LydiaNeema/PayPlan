@@ -15,10 +15,43 @@ export default function UpcomingPage() {
   const [filter, setFilter] = useState("all");
   const [loading, setLoading] = useState(true);
 
+  // 🔹 Mock Data
+  const mockPayments = {
+    upcomingPayments: [
+      {
+        id: 1,
+        amount: 1200,
+        dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days from now
+        service: { name: "Netflix", category: "Entertainment", color: "#EF4444" },
+      },
+      {
+        id: 2,
+        amount: 10000,
+        dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days from now
+        service: { name: "Rent", category: "Housing", color: "#3B82F6" },
+      },
+      {
+        id: 3,
+        amount: 1500,
+        dueDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString(), // tomorrow
+        service: { name: "Electricity", category: "Utilities", color: "#F59E0B" },
+      },
+    ],
+    overduePayments: [
+      {
+        id: 4,
+        amount: 800,
+        dueDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days ago
+        service: { name: "Water Bill", category: "Utilities", color: "#10B981" },
+      },
+    ],
+  };
+
   const loadData = async () => {
     setLoading(true);
     try {
-      const data = await getDashboardData();
+      // 🔹 Replace API call with mock
+      const data = mockPayments;
       setUpcomingPayments(data.upcomingPayments || []);
       setOverduePayments(data.overduePayments || []);
     } catch (error) {
@@ -30,8 +63,9 @@ export default function UpcomingPage() {
 
   const markPaymentAsPaid = async (paymentId) => {
     try {
-      await markPaymentPaid(paymentId);
-      await loadData();
+      // 🔹 For mock: just remove it from state
+      setUpcomingPayments((prev) => prev.filter((p) => p.id !== paymentId));
+      setOverduePayments((prev) => prev.filter((p) => p.id !== paymentId));
     } catch (error) {
       console.error("Error marking payment as paid:", error);
       alert("Error marking payment as paid.");

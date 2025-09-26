@@ -1,8 +1,8 @@
-"""fix db imports and models
+"""initial migration
 
-Revision ID: 47fd3bf387ce
+Revision ID: 8ac628f7ea2b
 Revises: 
-Create Date: 2025-09-25 15:16:00.939029
+Create Date: 2025-09-26 02:58:11.573956
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '47fd3bf387ce'
+revision = '8ac628f7ea2b'
 down_revision = None
 branch_labels = None
 depends_on = None
