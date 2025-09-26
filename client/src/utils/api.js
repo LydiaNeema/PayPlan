@@ -1,10 +1,13 @@
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:5000";
 
-export async function request(path, { method = "GET", body, token, isForm = false } = {}) {
+export async function request(
+  path,
+  { method = "GET", body, token, isForm = false } = {}
+) {
   const headers = {};
 
   if (token && !isForm) {
-    headers["Authorization"] = `Bearer ${token}`; // ✅ fixed template string
+    headers["Authorization"] = `Bearer ${token}`;
   }
 
   if (!isForm) {
@@ -56,11 +59,10 @@ export async function updateExpense(id, payload, token) {
 }
 
 export async function deleteExpense(id, token) {
-  return request(`/expenses/${id}`, { method: "DELETE", token }); 
+  return request(`/expenses/${id}`, { method: "DELETE", token });
 }
 
-// Payments
-
+// -------------------- Payments --------------------
 export async function getUpcomingPayments(token) {
   return request("/payments/upcoming", { method: "GET", token });
 }
@@ -73,17 +75,13 @@ export async function createPayment(payload, token) {
   return request("/payments", { method: "POST", body: payload, token });
 }
 
-// utils/api.js
-// PATCH partial/full payment
 export async function markPaymentAsPaid(paymentId, token, amount) {
   return request(`/payments/${paymentId}/pay`, {
     method: "PATCH",
     body: { amount },
-    token
+    token,
   });
 }
-
-
 
 // -------------------- Services --------------------
 export async function getServices(token) {
@@ -95,37 +93,80 @@ export async function createService(payload, token) {
 }
 
 export async function updateService(id, payload, token) {
-  return request(`/services/${id}`, { method: "PATCH", body: payload, token }); 
+  return request(`/services/${id}`, { method: "PATCH", body: payload, token });
 }
 
 export async function deleteService(id, token) {
-  return request(`/services/${id}`, { method: "DELETE", token }); 
+  return request(`/services/${id}`, { method: "DELETE", token });
 }
 
 // -------------------- Household --------------------
+
+// Create a household
+export async function createHousehold(name, token) {
+  return request(`/household/`, {
+    method: "POST",
+    body: { name },
+    token,
+  });
+}
+
+// Get the current user's household
 export async function getHousehold(token) {
-  return request("/household", { method: "GET", token });
+  return request(`/household/`, { method: "GET", token });
 }
 
+// Update household name
+export async function updateHousehold(id, name, token) {
+  return request(`/household/${id}`, {
+    method: "PUT",
+    body: { name },
+    token,
+  });
+}
+
+// Add a member to the household
 export async function createMember(payload, token) {
-  return request("/household/members", { method: "POST", body: payload, token });
+  return request(`/household/members`, {
+    method: "POST",
+    body: {
+      username: payload.username,
+      email: payload.email,
+      password: payload.password,
+      role: payload.role,
+    },
+    token,
+  });
 }
 
-export async function updateMember(id, payload, token) {
-  return request(`/household/members/${id}`, { method: "PATCH", body: payload, token });
+// Update a specific household member
+export async function updateMember(memberId, payload, token) {
+  return request(`/household/members/${memberId}`, {
+    method: "PUT",
+    body: {
+      ...(payload.username ? { username: payload.username } : {}),
+      ...(payload.email ? { email: payload.email } : {}),
+      ...(payload.role ? { role: payload.role } : {}),
+      ...(payload.password ? { password: payload.password } : {}),
+    },
+    token,
+  });
 }
 
-export async function deleteMember(id, token) {
-  return request(`/household/members/${id}`, { method: "DELETE", token });
+// Delete a household member
+export async function deleteMember(memberId, token) {
+  return request(`/household/members/${memberId}`, {
+    method: "DELETE",
+    token,
+  });
 }
 
-// -------------------- Dashboard (used in your pages) --------------------
+// -------------------- Dashboard --------------------
 export async function getDashboardData(token) {
-  const [upcomingPayments, overduePayments, paidPayments] = await Promise.all([
+  const [upcomingPayments, overduePayments] = await Promise.all([
     getUpcomingPayments(token),
     getOverduePayments(token),
-    getPaidPayments(token),
   ]);
 
-  return { upcomingPayments, overduePayments, paidPayments };
+  return { upcomingPayments, overduePayments };
 }

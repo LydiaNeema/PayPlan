@@ -12,7 +12,7 @@ import {
   markPaymentAsPaid,
 } from "../../utils/api";
 import { useAuth } from "../../context/AuthContext";
-import { getDashboardData } from "../../utils/api"; 
+
 
 export default function UpcomingPage() {
   const { user } = useAuth();
@@ -22,14 +22,18 @@ export default function UpcomingPage() {
   const [filter, setFilter] = useState("all");
   const [loading, setLoading] = useState(true);
 
-  const loadData = async () => {
-    setLoading(true);
+  const [showForm, setShowForm] = useState(false);
+  const [selectedPayment, setSelectedPayment] = useState(null);
+
+  const load = async () => {
     try {
-      const data = await getDashboardData();
-      setUpcomingPayments(data.upcomingPayments || []);
-      setOverduePayments(data.overduePayments || []);
-    } catch (error) {
-      console.error("Error loading payments:", error);
+      setLoading(true);
+      const up = await getUpcomingPayments("default-token");
+      const od = await getOverduePayments("default-token");
+      setUpcoming(up || []);
+      setOverdue(od || []);
+    } catch (err) {
+      console.error("Error fetching payments:", err);
     } finally {
       setLoading(false);
     }
@@ -44,19 +48,6 @@ export default function UpcomingPage() {
       alert("Error marking payment as paid.");
     }
   };
-  const markPaymentAsPaid = async (paymentId) => {
-    try {
-      setUpcomingPayments((prev) => prev.filter((p) => p.id !== paymentId));
-      setOverduePayments((prev) => prev.filter((p) => p.id !== paymentId));
-    } catch (error) {
-      console.error("Error marking payment as paid:", error);
-      alert("Error marking payment as paid.");
-    }
-  };
-
-  useEffect(() => {
-    loadData();
-  }, []);
 
   useEffect(() => {
     loadData();
