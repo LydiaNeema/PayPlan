@@ -44,6 +44,19 @@ export default function UpcomingPage() {
       alert("Error marking payment as paid.");
     }
   };
+  const markPaymentAsPaid = async (paymentId) => {
+    try {
+      setUpcomingPayments((prev) => prev.filter((p) => p.id !== paymentId));
+      setOverduePayments((prev) => prev.filter((p) => p.id !== paymentId));
+    } catch (error) {
+      console.error("Error marking payment as paid:", error);
+      alert("Error marking payment as paid.");
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
 
   useEffect(() => {
     loadData();
