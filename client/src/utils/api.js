@@ -42,6 +42,23 @@ export async function loginRequest(email, password) {
   return request("/auth/signin", { method: "POST", body: { email, password } });
 }
 
+// -------------------- Expenses --------------------
+export async function getExpenses(token) {
+  return request("/expenses", { method: "GET", token });
+}
+
+export async function createExpense(payload, token) {
+  return request("/expenses", { method: "POST", body: payload, token });
+}
+
+export async function updateExpense(id, payload, token) {
+  return request(`/expenses/${id}`, { method: "PATCH", body: payload, token });
+}
+
+export async function deleteExpense(id, token) {
+  return request(`/expenses/${id}`, { method: "DELETE", token });
+}
+
 // -------------------- Payments --------------------
 export async function getUpcomingPayments(token) {
   return request("/payments/upcoming", { method: "GET", token });
@@ -55,19 +72,17 @@ export async function createPayment(payload, token) {
   return request("/payments", { method: "POST", body: payload, token });
 }
 
-
-export async function getPaidPayments(token) {
-  // use '/history' (no trailing slash) to avoid redirect/preflight problems
-  return request("/history", { method: "GET", token });
-}
-
-// PATCH partial/full payment
 export async function markPaymentAsPaid(paymentId, token, amount) {
   return request(`/payments/${paymentId}/pay`, {
     method: "PATCH",
     body: { amount },
-    token
+    token,
   });
+}
+
+// Get fully/partially paid payments
+export async function getPaidPayments(token) {
+  return request("/history", { method: "GET", token });
 }
 
 // -------------------- Services --------------------
@@ -80,28 +95,90 @@ export async function createService(payload, token) {
 }
 
 export async function updateService(id, payload, token) {
-  return request(`/services/${id}`, { method: "PATCH", body: payload, token }); 
+  return request(`/services/${id}`, { method: "PATCH", body: payload, token });
 }
 
 export async function deleteService(id, token) {
-  return request(`/services/${id}`, { method: "DELETE", token }); 
+  return request(`/services/${id}`, { method: "DELETE", token });
 }
 
 // -------------------- Household --------------------
+
+// Create a household
+export async function createHousehold(name, token) {
+  return request(`/household/`, {
+    method: "POST",
+    body: { name },
+    token,
+  });
+}
+
+// Get the current user's household
 export async function getHousehold(token) {
   return request("/household", { method: "GET", token });
 }
 
+// Update household name
+export async function updateHousehold(id, name, token) {
+  return request(`/household/${id}`, {
+    method: "PUT",
+    body: { name },
+    token,
+  });
+}
+
+// Add a member (version 1 - structured fields)
+export async function createMemberDetailed(payload, token) {
+  return request(`/household/members`, {
+    method: "POST",
+    body: {
+      username: payload.username,
+      email: payload.email,
+      password: payload.password,
+      role: payload.role,
+    },
+    token,
+  });
+}
+
+// Add a member (version 2 - raw payload)
 export async function createMember(payload, token) {
-  return request("/household/members", { method: "POST", body: payload, token });
+  return request("/household/members", {
+    method: "POST",
+    body: payload,
+    token,
+  });
 }
 
-export async function updateMember(id, payload, token) {
-  return request(`/household/members/${id}`, { method: "PATCH", body: payload, token });
+// Update a specific household member (detailed selective update)
+export async function updateMemberDetailed(memberId, payload, token) {
+  return request(`/household/members/${memberId}`, {
+    method: "PUT",
+    body: {
+      ...(payload.username ? { username: payload.username } : {}),
+      ...(payload.email ? { email: payload.email } : {}),
+      ...(payload.role ? { role: payload.role } : {}),
+      ...(payload.password ? { password: payload.password } : {}),
+    },
+    token,
+  });
 }
 
-export async function deleteMember(id, token) {
-  return request(`/household/members/${id}`, { method: "DELETE", token });
+// Update a specific household member (simple raw patch)
+export async function updateMember(memberId, payload, token) {
+  return request(`/household/members/${memberId}`, {
+    method: "PATCH",
+    body: payload,
+    token,
+  });
+}
+
+// Delete a household member
+export async function deleteMember(memberId, token) {
+  return request(`/household/members/${memberId}`, {
+    method: "DELETE",
+    token,
+  });
 }
 
 // -------------------- Dashboard --------------------

@@ -1,10 +1,23 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Users, Plus, Crown, UserCheck, Mail, Trash2, Search, Bell } from "lucide-react";
+import {
+  Users,
+  Plus,
+  Crown,
+  UserCheck,
+  Trash2,
+  Search,
+  Bell,
+} from "lucide-react";
 import Navbar from "../../components/Navbar";
 import HouseholdCard from "../../components/HouseholdCard";
-import { getHousehold, createMember, updateMember, deleteMember } from "../../utils/api";
+import {
+  getHousehold,
+  createMember,
+  updateMember,
+  deleteMember,
+} from "../../utils/api";
 import { useAuth } from "../../context/AuthContext";
 
 export default function HouseholdPage() {
@@ -12,15 +25,22 @@ export default function HouseholdPage() {
   const [household, setHousehold] = useState(null);
   const [members, setMembers] = useState([]);
   const [showInvite, setShowInvite] = useState(false);
-  const [inviteData, setInviteData] = useState({ name: "", email: "", password: "", role: "member" });
+  const [inviteData, setInviteData] = useState({
+    username: "",
+    email: "",
+    password: "",
+    role: "member",
+  });
   const [loading, setLoading] = useState(false);
   const [token, setToken] = useState(null);
 
-  // Try to get token from localStorage
+  // Get token & fetch household
   useEffect(() => {
-    const t = localStorage.getItem("pp_token");
-    if (t) setToken(t);
-    fetchHousehold(t);
+    const t = localStorage.getItem("token");
+    if (t) {
+      setToken(t);
+      fetchHousehold(t);
+    }
   }, []);
 
   const fetchHousehold = async (tkn) => {
@@ -36,15 +56,19 @@ export default function HouseholdPage() {
   };
 
   const handleInvite = async () => {
-    if (!inviteData.name.trim() || !inviteData.email.trim() || !inviteData.password.trim()) {
-      alert("Please fill name, email and password");
+    if (
+      !inviteData.username.trim() ||
+      !inviteData.email.trim() ||
+      !inviteData.password.trim()
+    ) {
+      alert("Please fill username, email and password");
       return;
     }
     try {
       setLoading(true);
       const created = await createMember(
         {
-          name: inviteData.name,
+          username: inviteData.username,
           email: inviteData.email,
           password: inviteData.password,
           role: inviteData.role,
@@ -52,10 +76,15 @@ export default function HouseholdPage() {
         token
       );
       setMembers((prev) => [...prev, created]);
-      setInviteData({ name: "", email: "", password: "", role: "member" });
+      setInviteData({
+        username: "",
+        email: "",
+        password: "",
+        role: "member",
+      });
       setShowInvite(false);
     } catch (err) {
-      console.error(err);
+      console.error("Create member failed", err);
       alert(err.message || "Failed to create member");
     } finally {
       setLoading(false);
@@ -67,33 +96,42 @@ export default function HouseholdPage() {
       alert("Cannot remove the household owner");
       return;
     }
-    if (!confirm(`Remove ${member.name}?`)) return;
+    if (!confirm(`Remove ${member.username}?`)) return;
     try {
       await deleteMember(member.id, token);
       setMembers((prev) => prev.filter((m) => m.id !== member.id));
     } catch (err) {
-      console.error(err);
+      console.error("Remove failed", err);
       alert("Failed to remove member");
     }
   };
 
   const handleEdit = async (member) => {
-    const newName = prompt("New name", member.name);
+    const newUsername = prompt("New username", member.username);
     const newEmail = prompt("New email", member.email);
-    const newRole = prompt("Role (owner/admin/member)", member.role) || member.role;
+    const newRole =
+      prompt("Role (owner/admin/member)", member.role) || member.role;
 
-    if (!newName || !newEmail) return;
+    if (!newUsername || !newEmail) return;
     try {
-      const updated = await updateMember(member.id, { name: newName, email: newEmail, role: newRole }, token);
-      setMembers(members.map((m) => (m.id === updated.id ? updated : m)));
+      const updated = await updateMember(
+        member.id,
+        { username: newUsername, email: newEmail, role: newRole },
+        token
+      );
+      setMembers((prev) =>
+        prev.map((m) => (m.id === updated.id ? updated : m))
+      );
     } catch (err) {
-      console.error(err);
+      console.error("Update failed", err);
       alert("Failed to update member");
     }
   };
 
   const displayName =
-    user?.username || user?.name || (user?.email ? user.email.split("@")[0] : "User");
+    user?.username ||
+    user?.name ||
+    (user?.email ? user.email.split("@")[0] : "User");
 
   return (
     <div className="flex min-h-screen bg-gradient-to-b from-[#1E3A8A] to-[#0A1A33] text-white">
@@ -122,7 +160,9 @@ export default function HouseholdPage() {
               <div className="w-9 h-9 rounded-full bg-gradient-to-r from-blue-500 to-[#0A1A33] flex items-center justify-center font-bold text-sm">
                 {displayName.charAt(0).toUpperCase()}
               </div>
-              <span className="hidden sm:block text-white text-sm">{displayName}</span>
+              <span className="hidden sm:block text-white text-sm">
+                {displayName}
+              </span>
             </div>
           </div>
         </div>
@@ -136,8 +176,7 @@ export default function HouseholdPage() {
             ) : (
               <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl shadow p-6">
                 <p className="text-white/70">
-                  No household found — make sure you're logged in and belong to a
-                  household.
+                  No household found — members can still be created directly.
                 </p>
               </div>
             )}
@@ -168,15 +207,15 @@ export default function HouseholdPage() {
                   className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-lg p-4 flex justify-between items-center"
                 >
                   <div>
-                    <p className="font-semibold">{member.name}</p>
+                    <p className="font-semibold">{member.username}</p>
                     <p className="text-sm text-white/60">{member.email}</p>
                     <div className="flex items-center gap-2 mt-1">
-                      {member.role === "owner" ? (
+                      {member.role === "owner" && (
                         <Crown className="text-amber-400 w-4 h-4" />
-                      ) : null}
-                      {member.role === "admin" ? (
+                      )}
+                      {member.role === "admin" && (
                         <UserCheck className="text-indigo-500 w-4 h-4" />
-                      ) : null}
+                      )}
                       <span
                         className={`text-sm font-medium ${
                           member.role === "owner"
@@ -186,7 +225,8 @@ export default function HouseholdPage() {
                             : "text-gray-400"
                         }`}
                       >
-                        {member.role.charAt(0).toUpperCase() + member.role.slice(1)}
+                        {member.role.charAt(0).toUpperCase() +
+                          member.role.slice(1)}
                       </span>
                     </div>
                   </div>
@@ -235,14 +275,14 @@ export default function HouseholdPage() {
             </div>
             <div className="space-y-4">
               <label className="block text-sm font-medium text-white/70">
-                Name
+                Username
               </label>
               <input
                 className="w-full rounded-md bg-transparent border border-white/20 px-3 py-2 text-white"
                 type="text"
-                value={inviteData.name}
+                value={inviteData.username}
                 onChange={(e) =>
-                  setInviteData({ ...inviteData, name: e.target.value })
+                  setInviteData({ ...inviteData, username: e.target.value })
                 }
               />
               <label className="block text-sm font-medium text-white/70">

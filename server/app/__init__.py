@@ -1,9 +1,9 @@
 from flask import Flask
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
-from .config import db, migrate, api, SQLALCHEMY_DATABASE_URI, SQLALCHEMY_TRACK_MODIFICATIONS
+from .config import SQLALCHEMY_DATABASE_URI, SQLALCHEMY_TRACK_MODIFICATIONS
+from .extensions import db, migrate, api
 
-# ------------------- Create App -------------------
 def create_app():
     app = Flask(__name__)  
 
@@ -20,14 +20,14 @@ def create_app():
     api.init_app(app)
     CORS(app)
 
-    # ------------------- Import models -------------------
-    from app.models.user import User
-    from app.models.service import Service
-    from app.models.paymenthistory import PaymentHistory
-    from app.models.expense import Expense
-    from app.models.household import Household
-    from app.models.category import Category
-    
+    # ------------------- Import models after db is ready -------------------
+    with app.app_context():
+        from app.models.user import User
+        from app.models.service import Service
+        from app.models.paymenthistory import PaymentHistory
+        from app.models.expense import Expense
+        from app.models.household import Household
+        from app.models.category import Category
 
     # ------------------- Register blueprints -------------------
     from app.routes.auth import auth_bp
@@ -36,9 +36,6 @@ def create_app():
     from app.routes.expenses import expenses_bp
     from app.routes.household import household_bp
     from app.routes.categories import categories_bp
-    from app.routes.history import history_bp
-
-    # ✅ New imports
     from app.routes.dashboard import dashboard_bp
     from app.routes.history import history_bp
 
@@ -48,9 +45,6 @@ def create_app():
     app.register_blueprint(expenses_bp, url_prefix="/expenses")
     app.register_blueprint(household_bp, url_prefix="/household")
     app.register_blueprint(categories_bp, url_prefix="/categories")
-    
-
-    # ✅ New blueprints
     app.register_blueprint(dashboard_bp, url_prefix="/dashboard")
     app.register_blueprint(history_bp, url_prefix="/history")
 

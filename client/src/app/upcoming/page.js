@@ -13,6 +13,7 @@ import {
 } from "../../utils/api";
 import { useAuth } from "../../context/AuthContext";
 
+
 export default function UpcomingPage() {
   const { user } = useAuth();
 
@@ -38,47 +39,19 @@ export default function UpcomingPage() {
     }
   };
 
-  useEffect(() => {
-    load();
-  }, []);
-
-  
-const handleMarkAsPaid = async (id, amount) => {
-  try {
-    await markPaymentAsPaid(id, "default-token", amount);
-    load(); // refresh list
-  } catch (err) {
-    console.error("Error marking paid:", err);
-  }
-};
-
-
-  const handleAddPayment = (payment) => {
-    setSelectedPayment(payment);
-    setShowForm(true);
-  };
-
-  const handleSubmit = async (values, { resetForm }) => {
+  const markPaymentAsPaid = async (paymentId) => {
     try {
-      await createPayment(
-        {
-          ...values,
-          serviceId: selectedPayment?.service?.id || null,
-          userId: "default-user",
-          manualName: selectedPayment?.manualName || null,
-          category:
-            selectedPayment?.service?.category || selectedPayment?.category,
-          color: selectedPayment?.service?.color || selectedPayment?.color,
-        },
-        "default-token"
-      );
-      resetForm();
-      setShowForm(false);
-      load();
-    } catch (err) {
-      console.error("Error creating payment:", err);
+      setUpcomingPayments((prev) => prev.filter((p) => p.id !== paymentId));
+      setOverduePayments((prev) => prev.filter((p) => p.id !== paymentId));
+    } catch (error) {
+      console.error("Error marking payment as paid:", error);
+      alert("Error marking payment as paid.");
     }
   };
+
+  useEffect(() => {
+    loadData();
+  }, []);
 
   const getFilteredPayments = () => {
     const now = new Date();

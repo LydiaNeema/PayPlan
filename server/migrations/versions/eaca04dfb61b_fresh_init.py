@@ -1,8 +1,16 @@
+<<<<<<<< HEAD:server/migrations/versions/eaca04dfb61b_fresh_init.py
+"""fresh init
+
+Revision ID: eaca04dfb61b
+Revises: 
+Create Date: 2025-09-26 12:28:39.663388
+========
 """initial schema
 
 Revision ID: ae2a76735783
 Revises: 
 Create Date: 2025-09-26 13:22:27.898658
+>>>>>>>> 34a0bb7a029f8e2d851f37cc117116946b09d349:server/migrations/versions/ae2a76735783_initial_schema.py
 
 """
 from alembic import op
@@ -10,7 +18,11 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
+<<<<<<<< HEAD:server/migrations/versions/eaca04dfb61b_fresh_init.py
+revision = 'eaca04dfb61b'
+========
 revision = 'ae2a76735783'
+>>>>>>>> 34a0bb7a029f8e2d851f37cc117116946b09d349:server/migrations/versions/ae2a76735783_initial_schema.py
 down_revision = None
 branch_labels = None
 depends_on = None
