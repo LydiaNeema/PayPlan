@@ -5,7 +5,8 @@ import { Calendar, AlertTriangle, Search, Bell } from "lucide-react";
 import PaymentItem from "../../components/PaymentItem";
 import Navbar from "../../components/Navbar";
 import { useAuth } from "../../context/AuthContext";
-// import { getDashboardData, markPaymentPaid } from "../../utils/api";
+import { getDashboardData} from "../../utils/api"; 
+//markaspaid
 
 export default function UpcomingPage() {
   const { user } = useAuth();

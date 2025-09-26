@@ -1,17 +1,15 @@
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:5000";
 
-
 export async function request(path, { method = "GET", body, token, isForm = false } = {}) {
   const headers = {};
 
   if (token && !isForm) {
-    headers["Authorization"] = `Bearer ${token}`;
+    headers["Authorization"] = `Bearer ${token}`; // ✅ fixed template string
   }
 
   if (!isForm) {
     headers["Content-Type"] = "application/json";
   }
-
 
   const url = `${BASE_URL}${path}`.replace(/([^:]\/)\/+/g, "$1");
 
@@ -35,7 +33,7 @@ export async function request(path, { method = "GET", body, token, isForm = fals
   return data;
 }
 
-// Auth requests
+// -------------------- Auth --------------------
 export async function signupRequest(payload) {
   return request("/auth/signup", { method: "POST", body: payload });
 }
@@ -44,8 +42,7 @@ export async function loginRequest(email, password) {
   return request("/auth/signin", { method: "POST", body: { email, password } });
 }
 
-
-// Dashboard / expenses requests
+// -------------------- Expenses --------------------
 export async function getExpenses(token) {
   return request("/expenses", { method: "GET", token });
 }
@@ -59,10 +56,10 @@ export async function updateExpense(id, payload, token) {
 }
 
 export async function deleteExpense(id, token) {
-  return request(`/expenses/${id}`, { method: "DELETE", token });
+  return request(`/expenses/${id}`, { method: "DELETE", token }); 
 }
 
-// Payments 
+// -------------------- Payments --------------------
 export async function getUpcomingPayments(token) {
   return request("/payments/upcoming", { method: "GET", token });
 }
@@ -72,10 +69,15 @@ export async function getOverduePayments(token) {
 }
 
 export async function markPaymentAsPaid(paymentId, token) {
-  return request(`/payments/${paymentId}/pay`, { method: "POST", token });
+  return request(`/payments/${paymentId}/pay`, { method: "POST", token }); 
 }
 
-// Services CRUD
+// For HistoryPage
+export async function getPaidPayments(token) {
+  return request("/payments/history", { method: "GET", token });
+}
+
+// -------------------- Services --------------------
 export async function getServices(token) {
   return request("/services", { method: "GET", token });
 }
@@ -85,28 +87,37 @@ export async function createService(payload, token) {
 }
 
 export async function updateService(id, payload, token) {
-  return request(`/services/${id}`, { method: "PATCH", body: payload, token });
+  return request(`/services/${id}`, { method: "PATCH", body: payload, token }); 
 }
 
 export async function deleteService(id, token) {
-  return request(`/services/${id}`, { method: "DELETE", token });
+  return request(`/services/${id}`, { method: "DELETE", token }); 
 }
 
-// Household support for DashboardPage
+// -------------------- Household --------------------
 export async function getHousehold(token) {
   return request("/household", { method: "GET", token });
 }
 
-// Household & members
-// export async function getHousehold(token) {
-//   return request("/household/", { method: "GET", token });
-// }
 export async function createMember(payload, token) {
   return request("/household/members", { method: "POST", body: payload, token });
 }
+
 export async function updateMember(id, payload, token) {
   return request(`/household/members/${id}`, { method: "PATCH", body: payload, token });
 }
+
 export async function deleteMember(id, token) {
   return request(`/household/members/${id}`, { method: "DELETE", token });
+}
+
+// -------------------- Dashboard (used in your pages) --------------------
+export async function getDashboardData(token) {
+  const [upcomingPayments, overduePayments, paidPayments] = await Promise.all([
+    getUpcomingPayments(token),
+    getOverduePayments(token),
+    getPaidPayments(token),
+  ]);
+
+  return { upcomingPayments, overduePayments, paidPayments };
 }

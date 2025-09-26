@@ -5,8 +5,6 @@ from datetime import datetime
 
 services_bp = Blueprint("services", __name__)
 
-# CRUD for Services
-
 # GET all services
 @services_bp.route("", methods=["GET"])
 def get_services():
@@ -20,12 +18,12 @@ def create_service():
     data = request.get_json() or {}
 
     try:
+        # Handle next due date (accept both camelCase and snake_case)
         next_due_date = None
-        if data.get("next_due_date"):
+        if data.get("nextDueDate") or data.get("next_due_date"):
+            raw_date = data.get("nextDueDate") or data.get("next_due_date")
             try:
-                next_due_date = datetime.fromisoformat(
-                    data["next_due_date"].replace("Z", "+00:00")
-                )
+                next_due_date = datetime.fromisoformat(raw_date.replace("Z", "+00:00"))
             except ValueError:
                 return jsonify({"error": "Invalid date format"}), 400
 
@@ -34,8 +32,11 @@ def create_service():
             amount=data.get("amount"),
             description=data.get("description"),
             frequency=data.get("frequency"),
+            category=data.get("category"),
             color=data.get("color"),
             next_due_date=next_due_date,
+            user_id=data.get("userId") or data.get("user_id"),
+            household_id=data.get("householdId") or data.get("household_id"),
         )
 
         db.session.add(new_service)
@@ -63,18 +64,26 @@ def update_service(id):
             service.description = data["description"]
         if "frequency" in data:
             service.frequency = data["frequency"]
+        if "category" in data:
+            service.category = data["category"]
         if "color" in data:
             service.color = data["color"]
-        if "next_due_date" in data:
-            if data["next_due_date"]:
+
+        if "nextDueDate" in data or "next_due_date" in data:
+            raw_date = data.get("nextDueDate") or data.get("next_due_date")
+            if raw_date:
                 try:
-                    service.next_due_date = datetime.fromisoformat(
-                        data["next_due_date"].replace("Z", "+00:00")
-                    )
+                    service.next_due_date = datetime.fromisoformat(raw_date.replace("Z", "+00:00"))
                 except ValueError:
                     return jsonify({"error": "Invalid date format"}), 400
             else:
                 service.next_due_date = None
+
+        if "userId" in data or "user_id" in data:
+            service.user_id = data.get("userId") or data.get("user_id")
+
+        if "householdId" in data or "household_id" in data:
+            service.household_id = data.get("householdId") or data.get("household_id")
 
         db.session.commit()
         return jsonify(service.to_dict()), 200

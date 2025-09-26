@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Clock, CheckCircle, Search, Bell } from "lucide-react";
 import Navbar from "../../components/Navbar";
 import { useAuth } from "../../context/AuthContext";
-// import { getDashboardData } from "../../utils/api";
+import { getDashboardData } from "../../utils/api";
 
 export default function HistoryPage() {
   const { user } = useAuth();
