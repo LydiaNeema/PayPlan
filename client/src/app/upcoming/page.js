@@ -5,8 +5,7 @@ import { Calendar, AlertTriangle, Search, Bell } from "lucide-react";
 import PaymentItem from "../../components/PaymentItem";
 import Navbar from "../../components/Navbar";
 import { useAuth } from "../../context/AuthContext";
-import { getDashboardData} from "../../utils/api"; 
-//markaspaid
+import { getDashboardData } from "../../utils/api"; 
 
 export default function UpcomingPage() {
   const { user } = useAuth();
@@ -16,43 +15,10 @@ export default function UpcomingPage() {
   const [filter, setFilter] = useState("all");
   const [loading, setLoading] = useState(true);
 
-  // 🔹 Mock Data
-  const mockPayments = {
-    upcomingPayments: [
-      {
-        id: 1,
-        amount: 1200,
-        dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days from now
-        service: { name: "Netflix", category: "Entertainment", color: "#EF4444" },
-      },
-      {
-        id: 2,
-        amount: 10000,
-        dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days from now
-        service: { name: "Rent", category: "Housing", color: "#3B82F6" },
-      },
-      {
-        id: 3,
-        amount: 1500,
-        dueDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString(), // tomorrow
-        service: { name: "Electricity", category: "Utilities", color: "#F59E0B" },
-      },
-    ],
-    overduePayments: [
-      {
-        id: 4,
-        amount: 800,
-        dueDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days ago
-        service: { name: "Water Bill", category: "Utilities", color: "#10B981" },
-      },
-    ],
-  };
-
   const loadData = async () => {
     setLoading(true);
     try {
-      // 🔹 Replace API call with mock
-      const data = mockPayments;
+      const data = await getDashboardData();
       setUpcomingPayments(data.upcomingPayments || []);
       setOverduePayments(data.overduePayments || []);
     } catch (error) {
@@ -64,7 +30,6 @@ export default function UpcomingPage() {
 
   const markPaymentAsPaid = async (paymentId) => {
     try {
-      // 🔹 For mock: just remove it from state
       setUpcomingPayments((prev) => prev.filter((p) => p.id !== paymentId));
       setOverduePayments((prev) => prev.filter((p) => p.id !== paymentId));
     } catch (error) {
