@@ -3,13 +3,14 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from .config import SQLALCHEMY_DATABASE_URI, SQLALCHEMY_TRACK_MODIFICATIONS
 from .extensions import db, migrate, api
+import os
 
 def create_app():
     app = Flask(__name__)  
 
     # Config
-    app.config['SECRET_KEY'] = 'super-secret-key'
-    app.config['JWT_SECRET_KEY'] = 'super-secret-jwt-key'
+    app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "fallback-dev-key")
+    app.config['JWT_SECRET_KEY'] = os.getenv("JWT_SECRET_KEY", "fallback-dev-key")
     app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = SQLALCHEMY_TRACK_MODIFICATIONS
 
