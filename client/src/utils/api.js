@@ -1,6 +1,9 @@
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:5000";
 
-export async function request(path, { method = "GET", body, token, isForm = false } = {}) {
+export async function request(
+  path,
+  { method = "GET", body, token, isForm = false } = {}
+) {
   const headers = {};
 
   if (token && !isForm) {
@@ -68,19 +71,16 @@ export async function getOverduePayments(token) {
   return request("/payments/overdue", { method: "GET", token });
 }
 
-export async function createPayment(payload, token) {
-  return request("/payments", { method: "POST", body: payload, token });
-}
-
-export async function markPaymentAsPaid(paymentId, token, amount) {
+// ❌ createPayment removed — backend does not support POST /payments
+export async function markPaymentAsPaid(paymentId, token, amount = null) {
   return request(`/payments/${paymentId}/pay`, {
     method: "PATCH",
-    body: { amount },
+    body: amount ? { amount } : {},
     token,
   });
 }
 
-// Get fully/partially paid payments
+// -------------------- History --------------------
 export async function getPaidPayments(token) {
   return request("/history", { method: "GET", token });
 }
@@ -103,8 +103,6 @@ export async function deleteService(id, token) {
 }
 
 // -------------------- Household --------------------
-
-// Create a household
 export async function createHousehold(name, token) {
   return request(`/household/`, {
     method: "POST",
@@ -113,12 +111,10 @@ export async function createHousehold(name, token) {
   });
 }
 
-// Get the current user's household
 export async function getHousehold(token) {
-  return request("/household", { method: "GET", token });
+  return request(`/household/`, { method: "GET", token });
 }
 
-// Update household name
 export async function updateHousehold(id, name, token) {
   return request(`/household/${id}`, {
     method: "PUT",
@@ -127,8 +123,7 @@ export async function updateHousehold(id, name, token) {
   });
 }
 
-// Add a member (version 1 - structured fields)
-export async function createMemberDetailed(payload, token) {
+export async function createMember(payload, token) {
   return request(`/household/members`, {
     method: "POST",
     body: {
@@ -141,17 +136,7 @@ export async function createMemberDetailed(payload, token) {
   });
 }
 
-// Add a member (version 2 - raw payload)
-export async function createMember(payload, token) {
-  return request("/household/members", {
-    method: "POST",
-    body: payload,
-    token,
-  });
-}
-
-// Update a specific household member (detailed selective update)
-export async function updateMemberDetailed(memberId, payload, token) {
+export async function updateMember(memberId, payload, token) {
   return request(`/household/members/${memberId}`, {
     method: "PUT",
     body: {
@@ -164,30 +149,9 @@ export async function updateMemberDetailed(memberId, payload, token) {
   });
 }
 
-// Update a specific household member (simple raw patch)
-export async function updateMember(memberId, payload, token) {
-  return request(`/household/members/${memberId}`, {
-    method: "PATCH",
-    body: payload,
-    token,
-  });
-}
-
-// Delete a household member
 export async function deleteMember(memberId, token) {
   return request(`/household/members/${memberId}`, {
     method: "DELETE",
     token,
   });
-}
-
-// -------------------- Dashboard --------------------
-export async function getDashboardData(token) {
-  const [upcomingPayments, overduePayments, paidPayments] = await Promise.all([
-    getUpcomingPayments(token),
-    getOverduePayments(token),
-    getPaidPayments(token),
-  ]);
-
-  return { upcomingPayments, overduePayments, paidPayments };
 }

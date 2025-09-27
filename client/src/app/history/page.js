@@ -4,8 +4,7 @@ import { useEffect, useState } from "react";
 import { Clock, CheckCircle, Search, Bell } from "lucide-react";
 import Navbar from "../../components/Navbar";
 import { useAuth } from "../../context/AuthContext";
-import { getDashboardData } from "../../utils/api";
-
+import { getPaidPayments } from "../../utils/api";
 
 export default function HistoryPage() {
   const { user } = useAuth();
@@ -17,10 +16,11 @@ export default function HistoryPage() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const data = await getDashboardData();
-      setPaidPayments(data.paidPayments || []);
+      const data = await getPaidPayments(user?.token);
+      setPaidPayments(data || []);
     } catch (error) {
       console.error("Error loading payment history:", error);
+      setPaidPayments([]);
     } finally {
       setLoading(false);
     }
@@ -49,7 +49,8 @@ export default function HistoryPage() {
       case "this-year":
         return paidPayments.filter(
           (p) =>
-            new Date(p.paidDate || p.dueDate) >= new Date(now.getFullYear(), 0, 1)
+            new Date(p.paidDate || p.dueDate) >=
+            new Date(now.getFullYear(), 0, 1)
         );
       default:
         return paidPayments;
@@ -83,7 +84,9 @@ export default function HistoryPage() {
       key: "this-year",
       label: "This Year",
       count: paidPayments.filter(
-        (p) => new Date(p.paidDate || p.dueDate) >= new Date(new Date().getFullYear(), 0, 1)
+        (p) =>
+          new Date(p.paidDate || p.dueDate) >=
+          new Date(new Date().getFullYear(), 0, 1)
       ).length,
     },
   ];
