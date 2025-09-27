@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Clock, CheckCircle, Search, Bell } from "lucide-react";
 import Navbar from "../../components/Navbar";
 import { useAuth } from "../../context/AuthContext";
@@ -8,12 +8,12 @@ import { getPaidPayments } from "../../utils/api";
 
 export default function HistoryPage() {
   const { user } = useAuth();
-
   const [paidPayments, setPaidPayments] = useState([]);
   const [filter, setFilter] = useState("all");
   const [loading, setLoading] = useState(true);
 
-  const loadData = async () => {
+  // Load payment history
+  const loadData = useCallback(async () => {
     setLoading(true);
     try {
       const data = await getPaidPayments(user?.token);
@@ -24,11 +24,11 @@ export default function HistoryPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user?.token]);
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [loadData]);
 
   const getFilteredPayments = () => {
     const now = new Date();
@@ -37,6 +37,7 @@ export default function HistoryPage() {
       d.setDate(now.getDate() - days);
       return d;
     };
+
     switch (filter) {
       case "last-30":
         return paidPayments.filter(
@@ -99,9 +100,7 @@ export default function HistoryPage() {
     }).format(amount);
 
   const displayName =
-    user?.username ||
-    user?.name ||
-    (user?.email ? user.email.split("@")[0] : "User");
+    user?.username || user?.name || (user?.email ? user.email.split("@")[0] : "User");
 
   if (loading) {
     return (
@@ -121,10 +120,7 @@ export default function HistoryPage() {
           <h1 className="text-xl font-bold tracking-wide">Payment History</h1>
           <div className="flex items-center gap-4">
             <div className="relative">
-              <Search
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                size={18}
-              />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
               <input
                 type="text"
                 placeholder="Search payments"
@@ -138,9 +134,7 @@ export default function HistoryPage() {
               <div className="w-9 h-9 rounded-full bg-gradient-to-r from-blue-500 to-[#0A1A33] flex items-center justify-center font-bold text-sm">
                 {displayName.charAt(0).toUpperCase()}
               </div>
-              <span className="hidden sm:block text-white text-sm">
-                {displayName}
-              </span>
+              <span className="hidden sm:block text-white text-sm">{displayName}</span>
             </div>
           </div>
         </div>
@@ -164,9 +158,7 @@ export default function HistoryPage() {
                   {option.count > 0 && (
                     <span
                       className={`ml-1 px-2 py-0.5 rounded-full text-xs font-bold ${
-                        isActive
-                          ? "bg-white/20 text-white"
-                          : "bg-white/10 text-white/60"
+                        isActive ? "bg-white/20 text-white" : "bg-white/10 text-white/60"
                       }`}
                     >
                       {option.count}
@@ -182,10 +174,7 @@ export default function HistoryPage() {
         <div className="px-6 pb-10">
           {filteredPayments.length === 0 ? (
             <div className="text-center mt-20 space-y-4">
-              <Clock
-                size={56}
-                className="mx-auto text-gray-400 drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]"
-              />
+              <Clock size={56} className="mx-auto text-gray-400 drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]" />
               <h2 className="text-2xl font-bold">No Payment History</h2>
               <p className="text-white/60">
                 {filter === "all"
@@ -198,8 +187,7 @@ export default function HistoryPage() {
               {filteredPayments
                 .sort(
                   (a, b) =>
-                    new Date(b.paidDate || b.dueDate) -
-                    new Date(a.paidDate || a.dueDate)
+                    new Date(b.paidDate || b.dueDate) - new Date(a.paidDate || a.dueDate)
                 )
                 .map((payment) => (
                   <div
@@ -207,20 +195,13 @@ export default function HistoryPage() {
                     className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.4)] p-4 hover:bg-white/10 transition-colors flex justify-between items-center"
                   >
                     <div>
-                      <p className="font-semibold text-white">
-                        {payment.serviceName}
-                      </p>
+                      <p className="font-semibold text-white">{payment.serviceName}</p>
                       <p className="text-sm text-gray-400">
-                        Paid on{" "}
-                        {new Date(
-                          payment.paidDate || payment.dueDate
-                        ).toLocaleDateString()}
+                        Paid on {new Date(payment.paidDate || payment.dueDate).toLocaleDateString()}
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <p className="font-bold text-green-400">
-                        {formatCurrency(payment.amount)}
-                      </p>
+                      <p className="font-bold text-green-400">{formatCurrency(payment.amount)}</p>
                       <CheckCircle size={20} className="text-green-500" />
                     </div>
                   </div>

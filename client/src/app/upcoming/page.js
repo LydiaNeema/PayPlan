@@ -189,7 +189,7 @@ export default function UpcomingPage() {
                   />
                   <h2 className="text-2xl font-bold">No Overdue Payments</h2>
                   <p className="text-white/60">
-                    Great job! You don't have any overdue payments.
+                    Great job! You don&apos;t have any overdue payments.
                   </p>
                 </>
               ) : (

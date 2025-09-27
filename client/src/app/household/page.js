@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Users,
   Plus,
@@ -34,16 +34,8 @@ export default function HouseholdPage() {
   const [loading, setLoading] = useState(false);
   const [token, setToken] = useState(null);
 
-  // Get token & fetch household
-  useEffect(() => {
-    const t = localStorage.getItem("token");
-    if (t) {
-      setToken(t);
-      fetchHousehold(t);
-    }
-  }, []);
-
-  const fetchHousehold = async (tkn) => {
+  // Fetch household, wrapped in useCallback to avoid useEffect warning
+  const fetchHousehold = useCallback(async (tkn) => {
     try {
       const data = await getHousehold(tkn || token);
       setHousehold(data);
@@ -53,7 +45,16 @@ export default function HouseholdPage() {
       setHousehold(null);
       setMembers([]);
     }
-  };
+  }, [token]);
+
+  // Get token & fetch household
+  useEffect(() => {
+    const t = localStorage.getItem("token");
+    if (t) {
+      setToken(t);
+      fetchHousehold(t);
+    }
+  }, [fetchHousehold]);
 
   const handleInvite = async () => {
     if (
