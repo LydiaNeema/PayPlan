@@ -68,4 +68,3 @@ def profile():
         "username": user.username,
         "email": user.email
     }), 200
-

@@ -7,20 +7,20 @@ from .extensions import db, migrate, api
 def create_app():
     app = Flask(__name__)  
 
-    # ------------------- Config -------------------
+    # Config
     app.config['SECRET_KEY'] = 'super-secret-key'
     app.config['JWT_SECRET_KEY'] = 'super-secret-jwt-key'
     app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = SQLALCHEMY_TRACK_MODIFICATIONS
 
-    # ------------------- Extensions -------------------
+    # Initialize extensions
     db.init_app(app)
     migrate.init_app(app, db)
     JWTManager(app)
     api.init_app(app)
     CORS(app)
 
-    # ------------------- Import models after db is ready -------------------
+    # Import models **after db is initialized**
     with app.app_context():
         from app.models.user import User
         from app.models.service import Service
@@ -29,7 +29,7 @@ def create_app():
         from app.models.household import Household
         from app.models.category import Category
 
-    # ------------------- Register blueprints -------------------
+    # Register blueprints
     from app.routes.auth import auth_bp
     from app.routes.services import services_bp
     from app.routes.payments import payments_bp
@@ -48,7 +48,6 @@ def create_app():
     app.register_blueprint(dashboard_bp, url_prefix="/dashboard")
     app.register_blueprint(history_bp, url_prefix="/history")
 
-    # ------------------- Optional Test Route -------------------
     @app.route('/')
     def home():
         return {"message": "Backend is running!"}

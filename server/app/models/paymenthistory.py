@@ -1,11 +1,15 @@
 from app import db
-from datetime import date, datetime
+from datetime import datetime, date
 
 class PaymentHistory(db.Model):
     __tablename__ = "payment_history"
 
     id = db.Column(db.Integer, primary_key=True)
+
+    # If payment is linked to a service, this may point to it; manual payments allowed (nullable)
     service_id = db.Column(db.Integer, db.ForeignKey("services.id"), nullable=True)
+
+    # Nullable user_id so service-created payments can exist without explicit user
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
 
     manual_name = db.Column(db.String(120), nullable=True)
@@ -14,11 +18,10 @@ class PaymentHistory(db.Model):
 
     amount = db.Column(db.Float, nullable=False)
     due_date = db.Column(db.Date, nullable=False)
-    paid = db.Column(db.Boolean, default=False, nullable=False)
 
-    # New fields
-    paid_date = db.Column(db.DateTime, nullable=True)   # ✅ store when paid
-    reimbursed = db.Column(db.Boolean, default=False)   # ✅ track reimbursements
+    paid = db.Column(db.Boolean, default=False, nullable=False)
+    paid_date = db.Column(db.DateTime, nullable=True)  # ✅ Added
+    reimbursed = db.Column(db.Boolean, default=False, nullable=False)  # ✅ Added
 
     # Relationships
     service = db.relationship("Service", back_populates="payment_history", lazy="joined")
@@ -37,7 +40,7 @@ class PaymentHistory(db.Model):
         return {
             "id": self.id,
             "serviceId": self.service_id,
-            "serviceName": self.service.name if self.service else self.manual_name,
+            "service": service_obj,
             "manualName": self.manual_name,
             "userId": self.user_id,
             "amount": self.amount,
@@ -47,5 +50,4 @@ class PaymentHistory(db.Model):
             "reimbursed": self.reimbursed,
             "category": self.category,
             "color": self.color,
-            "service": service_obj,
         }

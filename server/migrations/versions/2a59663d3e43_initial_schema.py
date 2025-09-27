@@ -1,16 +1,8 @@
-<<<<<<<< HEAD:server/migrations/versions/eaca04dfb61b_fresh_init.py
-"""fresh init
-
-Revision ID: eaca04dfb61b
-Revises: 
-Create Date: 2025-09-26 12:28:39.663388
-========
 """initial schema
 
-Revision ID: ae2a76735783
+Revision ID: 2a59663d3e43
 Revises: 
-Create Date: 2025-09-26 13:22:27.898658
->>>>>>>> 34a0bb7a029f8e2d851f37cc117116946b09d349:server/migrations/versions/ae2a76735783_initial_schema.py
+Create Date: 2025-09-27 05:03:47.954048
 
 """
 from alembic import op
@@ -18,11 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-<<<<<<<< HEAD:server/migrations/versions/eaca04dfb61b_fresh_init.py
-revision = 'eaca04dfb61b'
-========
-revision = 'ae2a76735783'
->>>>>>>> 34a0bb7a029f8e2d851f37cc117116946b09d349:server/migrations/versions/ae2a76735783_initial_schema.py
+revision = '2a59663d3e43'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -47,6 +35,7 @@ def upgrade():
     sa.Column('username', sa.String(length=80), nullable=False),
     sa.Column('email', sa.String(length=120), nullable=False),
     sa.Column('password_hash', sa.String(length=256), nullable=False),
+    sa.Column('role', sa.String(length=20), nullable=True),
     sa.Column('household_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['household_id'], ['households.id'], name=op.f('fk_users_household_id_households')),
     sa.PrimaryKeyConstraint('id'),
@@ -92,6 +81,8 @@ def upgrade():
     sa.Column('amount', sa.Float(), nullable=False),
     sa.Column('due_date', sa.Date(), nullable=False),
     sa.Column('paid', sa.Boolean(), nullable=False),
+    sa.Column('paid_date', sa.DateTime(), nullable=True),
+    sa.Column('reimbursed', sa.Boolean(), nullable=False),
     sa.ForeignKeyConstraint(['service_id'], ['services.id'], name=op.f('fk_payment_history_service_id_services')),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], name=op.f('fk_payment_history_user_id_users')),
     sa.PrimaryKeyConstraint('id')
