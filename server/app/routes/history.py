@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from app.models.paymenthistory import PaymentHistory
 
-history_bp = Blueprint("history", __name__, url_prefix="/history")
+history_bp = Blueprint("history", __name__, url_prefix="/history")  
 
 # Accept both /history and /history/ to avoid redirects (preflight 308)
 @history_bp.route("", methods=["GET"])
@@ -11,7 +11,7 @@ def get_payment_history():
     user_id = request.args.get("userId")
     reimbursed = request.args.get("reimbursed")
 
-    # Base query: only paid payments
+    # Base query: only paid payments (includes contributions now)
     query = PaymentHistory.query.filter(PaymentHistory.paid == True)
 
     # Apply filters if provided

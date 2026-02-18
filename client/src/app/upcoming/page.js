@@ -4,15 +4,12 @@ import { useEffect, useState } from "react";
 import { Calendar, AlertTriangle, Search, Bell } from "lucide-react";
 import Navbar from "../../components/Navbar";
 import PaymentItem from "../../components/PaymentItem";
-import FormikPaymentForm from "../../components/FormikPaymentForm";
 import {
   getUpcomingPayments,
   getOverduePayments,
-  createPayment,
-  markPaymentAsPaid,
+  markPaymentAsPaid as apiMarkPaymentAsPaid,
 } from "../../utils/api";
 import { useAuth } from "../../context/AuthContext";
-
 
 export default function UpcomingPage() {
   const { user } = useAuth();
@@ -21,9 +18,6 @@ export default function UpcomingPage() {
   const [overdue, setOverdue] = useState([]);
   const [filter, setFilter] = useState("all");
   const [loading, setLoading] = useState(true);
-
-  const [showForm, setShowForm] = useState(false);
-  const [selectedPayment, setSelectedPayment] = useState(null);
 
   const load = async () => {
     try {
@@ -39,10 +33,10 @@ export default function UpcomingPage() {
     }
   };
 
-  const markPaymentAsPaid = async (paymentId) => {
+  const handleMarkAsPaid = async (paymentId, amount = null) => {
     try {
-      setUpcomingPayments((prev) => prev.filter((p) => p.id !== paymentId));
-      setOverduePayments((prev) => prev.filter((p) => p.id !== paymentId));
+      await apiMarkPaymentAsPaid(paymentId, "default-token", amount);
+      await load(); // refresh payments after paying
     } catch (error) {
       console.error("Error marking payment as paid:", error);
       alert("Error marking payment as paid.");
@@ -50,7 +44,7 @@ export default function UpcomingPage() {
   };
 
   useEffect(() => {
-    loadData();
+    load();
   }, []);
 
   const getFilteredPayments = () => {
@@ -223,7 +217,6 @@ export default function UpcomingPage() {
                   <PaymentItem
                     payment={payment}
                     onMarkAsPaid={handleMarkAsPaid}
-                    onAddPayment={handleAddPayment}
                   />
                 </div>
               ))}
@@ -231,22 +224,6 @@ export default function UpcomingPage() {
           )}
         </div>
       </div>
-
-      {/* Add Payment Modal */}
-      {showForm && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/70 z-50">
-          <div className="bg-gray-900 p-6 rounded-xl w-full max-w-lg">
-            <FormikPaymentForm
-              initialValues={{
-                amount: selectedPayment?.amount || "",
-                dueDate: new Date().toISOString().split("T")[0],
-              }}
-              onSubmit={handleSubmit}
-              onCancel={() => setShowForm(false)}
-            />
-          </div>
-        </div>
-      )}
     </div>
   );
 }

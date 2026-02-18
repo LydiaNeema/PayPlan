@@ -1,124 +1,76 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Clock, AlertCircle } from "lucide-react";
 
 export default function PaymentItem({ payment, onMarkAsPaid }) {
-  const [amountToPay, setAmountToPay] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [showPartial, setShowPartial] = useState(false);
+  const [partialAmount, setPartialAmount] = useState("");
 
-  const formatAmount = (amount) =>
-    new Intl.NumberFormat("en-KE", {
-      style: "currency",
-      currency: "KES",
-    }).format(amount);
-
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffTime = date.getTime() - now.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    if (diffDays < 0) return `${Math.abs(diffDays)} days overdue`;
-    if (diffDays === 0) return "Due today";
-    if (diffDays === 1) return "Due tomorrow";
-    return `Due in ${diffDays} days`;
-  };
-
-  const getStatusColor = () => {
-    const dueDate = new Date(payment.dueDate);
-    const now = new Date();
-    const diffDays = Math.ceil(
-      (dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
-    );
-
-    if (diffDays < 0) return "text-red-500";
-    if (diffDays <= 3) return "text-yellow-400";
-    return "text-gray-400";
-  };
-
-  const getStatusIcon = () => {
-    const dueDate = new Date(payment.dueDate);
-    const now = new Date();
-    const diffDays = Math.ceil(
-      (dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
-    );
-    return diffDays < 0 ? AlertCircle : Clock;
-  };
-
-  const StatusIcon = getStatusIcon();
-  const statusColor = getStatusColor();
-
-  // Safe values for service/manual
-  const serviceName =
-    payment.service?.name || payment.manualName || "Unknown Service";
-  const serviceCategory =
-    payment.service?.category || payment.category || "General";
-  const serviceColor = payment.service?.color || payment.color || "#4ade80";
-
-  const handlePartialPay = async () => {
-    if (!amountToPay || isNaN(amountToPay) || amountToPay <= 0) {
-      alert("Please enter a valid amount.");
+  const handlePartialPayment = () => {
+    const amount = parseFloat(partialAmount);
+    if (!amount || amount <= 0) {
+      alert("Enter a valid amount");
       return;
     }
-    setLoading(true);
-    try {
-      await onMarkAsPaid(payment.id, parseFloat(amountToPay));
-      setAmountToPay("");
-    } catch (err) {
-      console.error("Error making payment:", err);
-      alert("Failed to process payment.");
-    } finally {
-      setLoading(false);
-    }
+    onMarkAsPaid(payment.id, amount);
+    setShowPartial(false);
+    setPartialAmount("");
   };
 
   return (
-    <div className="flex bg-gray-800 rounded-xl overflow-hidden shadow-md m-3">
-      <div className="w-1" style={{ backgroundColor: serviceColor }} />
-      <div className="flex-1 p-4 flex flex-col gap-3">
-        {/* Header */}
-        <div className="flex justify-between items-start">
-          <div className="flex-1 mr-3">
-            <p className="text-gray-100 font-semibold text-lg">{serviceName}</p>
-            <p className="text-gray-400 text-sm">{serviceCategory}</p>
-          </div>
-          <p className="text-gray-100 font-bold text-lg">
-            {formatAmount(payment.amount)}
+    <div className="p-4 rounded-lg bg-white/5 border border-white/10">
+      <div className="flex justify-between items-center">
+        <div>
+          <h3 className="text-lg font-semibold">{payment.serviceName}</h3>
+          <p className="text-sm text-gray-400">
+            Due: {new Date(payment.dueDate).toLocaleDateString()}
           </p>
+          <p className="text-sm">
+            Amount: <span className="font-bold">${payment.amount}</span>
+          </p>
+          <p className="text-sm text-gray-400">Status: {payment.status}</p>
         </div>
 
-        {/* Footer */}
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <StatusIcon className={`w-4 h-4 ${statusColor}`} />
-            <span className={`text-sm font-medium ${statusColor}`}>
-              {formatDate(payment.dueDate)}
-            </span>
-          </div>
+        <div className="flex flex-col gap-2">
+          {/* Full Payment Button */}
+          <button
+            onClick={() => onMarkAsPaid(payment.id)}
+            className="px-4 py-2 bg-green-600 rounded-lg hover:bg-green-700 transition-colors"
+          >
+            Mark Paid
+          </button>
 
-          <div className="flex items-center gap-2">
-            {/* Input for partial payment */}
-            <input
-              type="number"
-              min="1"
-              value={amountToPay}
-              onChange={(e) => setAmountToPay(e.target.value)}
-              placeholder="Enter amount"
-              className="w-28 bg-gray-700 text-white text-sm px-2 py-1 rounded-md outline-none border border-gray-600 focus:border-green-500"
-            />
-
+          {/* Partial Payment Toggle */}
+          {showPartial ? (
+            <div className="flex flex-col gap-2">
+              <input
+                type="number"
+                value={partialAmount}
+                onChange={(e) => setPartialAmount(e.target.value)}
+                placeholder="Enter amount"
+                className="px-2 py-1 rounded text-black"
+              />
+              <button
+                onClick={handlePartialPayment}
+                className="px-3 py-1 bg-blue-600 rounded hover:bg-blue-700"
+              >
+                Confirm
+              </button>
+              <button
+                onClick={() => setShowPartial(false)}
+                className="px-3 py-1 bg-gray-600 rounded hover:bg-gray-700"
+              >
+                Cancel
+              </button>
+            </div>
+          ) : (
             <button
-              onClick={handlePartialPay}
-              disabled={loading}
-              className="flex items-center gap-1 bg-green-500/20 text-green-500 px-3 py-1.5 rounded-full font-semibold hover:bg-green-500/30 transition disabled:opacity-50"
+              onClick={() => setShowPartial(true)}
+              className="px-4 py-2 bg-yellow-600 rounded-lg hover:bg-yellow-700 transition-colors"
             >
-              <Check className="w-4 h-4" />
-              <span className="text-sm">
-                {loading ? "Saving..." : "Pay"}
-              </span>
+              Partial Payment
             </button>
-          </div>
+          )}
         </div>
       </div>
     </div>
